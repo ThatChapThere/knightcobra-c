@@ -1,5 +1,7 @@
 # Chess program specification
 
+### the most significant bit of the bitboard is a8, and the second most significan bit is b8
+
 ## Things the program must do:
 * store positions
 * generate legal moves from a position
