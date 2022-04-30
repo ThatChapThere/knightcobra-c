@@ -6,6 +6,7 @@
 #define MAX_MOVE_CONDITIONS 10
 #define MAX_MOVE_EFFECTS 10
 #define MAX_LEGAL_MOVES 28
+#define NUMBER_OF_SQUARES 64
 
 #define MIN_WHITE_MAN_INDEX 0
 #define MAX_WHITE_MAN_INDEX 5
@@ -46,6 +47,6 @@ struct moves{
     struct move moves[MAX_LEGAL_MOVES];
 };
 
-extern void generate_bitboards(struct moves * legal_moves)
+extern void generate_bitboards(struct moves * legal_moves);
 
 #endif
