@@ -1,0 +1,8 @@
+# Object, executable and json files
+*.o
+*.exe
+*.json
+*.bat
+
+# Commands.md helper file
+commands.md
