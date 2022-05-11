@@ -11,7 +11,7 @@
 * convert moves into algebreic notation
 
 ## Bitboard design
-* for effient accessing of moves, bitboards are stored per piece per square
+* for efficient accessing of moves, bitboards are stored per piece per square
 * moves have a set of conditions where some bitboards either must:
   * be filled at specific bits: `bitboard & condition != 0 &&` same for all others
   * be empty at specific bits: `bitboard | condition == 0 &&` same for all others
@@ -26,7 +26,7 @@ void generate_bitboards(struct moves * legal_moves);
 ```
 
 ## Structs:
-```c
+```C
 move_condition
 move_effect
 move
@@ -34,6 +34,6 @@ moves
 ```
 
 ## Enums:
-```c
-enum piece_type {white_pawn ... black_control}
+```C
+piece_type {white_pawn ... black_control}
 ```
