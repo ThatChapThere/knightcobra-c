@@ -1,7 +1,6 @@
-# Chess program specification
+# Chess Program Specification
 
-## Things the program must do:
-* the most significant bit of the bitboard is a8, and the second most significan bit is b8
+## Things the Program Must Do
 * store positions
 * generate legal moves from a position
 * generate bitboards for legal moves for each piece
@@ -10,7 +9,8 @@
 * store entire move tree somehow
 * convert moves into algebreic notation
 
-## Bitboard design
+## Bitboard Design
+* the most significant bit of the bitboard is a8, and the second most significan bit is b8
 * for efficient accessing of moves, bitboards are stored per piece per square
 * moves have a set of conditions where some bitboards either must:
   * be filled at specific bits: `bitboard & condition != 0 &&` same for all others
@@ -19,21 +19,8 @@
   * be filled with a specific piece: `bitboard |= positions`
   * be emptied of a specific piece: `bitboard &= ~positions`
 
-
-## Functions:
+## Important Procedures
 ```C
-void generate_bitboards(struct moves * legal_moves);
+void generate_bitboards(moves * legal_moves);
 ```
-
-## Structs:
-```C
-move_condition
-move_effect
-move
-moves
-```
-
-## Enums:
-```C
-piece_type {white_pawn ... black_control}
-```
+Generates the bitboards at the beginning of the program, at a specified memory location
