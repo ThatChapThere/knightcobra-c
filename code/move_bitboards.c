@@ -3,114 +3,178 @@
 #include <stdbool.h>
 #include "move_bitboards.h"
 
+#define lambda(x) {return x;}
+
 #define BOARD_WIDTH 8
 #define NUMBER_OF_LINE_PIECES 6
 #define NUMBER_OF_STRAIGHT_PIECES 4
 #define NUMBER_OF_DIAGONAL_PIECES 4
 #define LINE_MOVE_TYPES 4
 
-/* number of chessman types per side */
-#define MEN_PER_SIDE 6
+#define WHITE_KINGSQUARE get_bit_from_coords(4, 7)
+#define WHITE_CASTLE_QUEENSIDE_ENDSQUARE get_bit_from_coords(2, 7)
+#define WHITE_CASTLE_QUEENSIDE_ROOKSQUARE get_bit_from_coords(7, 7)
+#define WHITE_CASTLE_KINGSIDE_ENDSQUARE get_bit_from_coords(6, 7)
+#define WHITE_CASTLE_KINGSIDE_ROOKSQUARE get_bit_from_coords(7, 7)
 
-bool is_rook[NUMBER_OF_CHESSMEN] = { [white_rook] = true, [black_rook] = true };
-bool is_bishop[NUMBER_OF_CHESSMEN] = { [white_bishop] = true, [black_bishop] = true };
+#define BLACK_KINGSQUARE get_bit_from_coords(4, 0)
+#define BLACK_CASTLE_QUEENSIDE_ENDSQUARE get_bit_from_coords(2, 0)
+#define BLACK_CASTLE_QUEENSIDE_ROOKSQUARE get_bit_from_coords(0, 0)
+#define BLACK_CASTLE_KINGSIDE_ENDSQUARE get_bit_from_coords(6, 0)
+#define BLACK_CASTLE_KINGSIDE_ROOKSQUARE get_bit_from_coords(7, 0)
 
-square_datum line_pieces[] = { white_rook, white_bishop, white_queen, black_rook, black_bishop, black_queen };
+#define pawn_on_start_row(pawn, r) (is_white(pawn) ? r == 6 : r == 1)
+#define pawn_about_to_promote(pawn, r) (is_white(pawn) ? r == 1 : r == 6)
+#define pawn_row_invalid(r) (r == 0 || r == 7)
+#define can_enpassant(pawn, r) (is_white(pawn) ? r == 3 : r == 4)
 
-square_datum white_men[] = { white_pawn, white_rook, white_knight, white_bishop, white_queen, white_king };
-square_datum black_men[] = { black_pawn, black_rook, black_knight, black_bishop, black_queen, black_king };
+#define is_white(chessman) (chessman <= MAX_WHITE_MAN_INDEX)
+
+
+    /* enums */
+typedef enum{ pawn, rook, knight, bishop, queen, king } chessman_type;
 
 typedef enum {
     file, rank, backslash_diagonal, forwardslash_diagonal
 } line_move;
 
-/* function declarations */
-void add_data_to_condition_or_effect(
-    square_datum *square_data, int data_count, square_datum *condition_or_effect_data, int *condition_or_effect_data_count
-);
-void add_datum_to_condition_or_effect(
-    square_datum the_square_datum,
-    square_datum *condition_or_effect_data,
-    int *condition_or_effect_data_count
-);
+typedef enum { queenside, kingside } castling_side;
 
-void add_start_square_to_move(move *current_move, bitboard square, square_datum man);
-void add_intermediate_squares_to_move(move *current_move, bitboard squares, square_datum man);
-void add_end_square_to_move(move *current_move, bitboard square, square_datum man);
 
-bool is_white(square_datum man);
-square_datum *own_men(square_datum man);
-square_datum *opponent_men(square_datum man);
-bitboard get_bit_from_line_move(int f, int r, int distance, line_move line_move_type);
-bitboard get_bit_from_coords(int f, int r);
+    /* function declarations */
+void generate_line_piece_bitboards (moveset_type *legal_moves, int f, int r, bitboard_type startsquare);
+void generate_knight_bitboards     (moveset_type *legal_moves, int f, int r, bitboard_type startsquare);
+void generate_king_bitboards       (moveset_type *legal_moves, int f, int r, bitboard_type startsquare);
+void generate_pawn_bitboards       (moveset_type *legal_moves, int f, int r, bitboard_type startsquare);
 
+void add_single_effect(move_type *move, bitboard_type squares, square_datum_type chessman, bool is_addition);
+void add_datum_to_squares(move_type *move, bitboard_type squares, square_datum_type chessman);
+void remove_datum_from_squares(move_type *move, bitboard_type squares, square_datum_type chessman);
+
+void add_single_condition(move_type *move, bitboard_type squares, square_datum_type chessman, bool must_be_filled);
+void squares_must_have(move_type *move, bitboard_type squares, square_datum_type chessman);
+void squares_must_be_free_of(move_type *move, bitboard_type squares, square_datum_type chessman);
+
+void add_intermediate_squares_to_move(move_type *move, bitboard_type squares);
+void add_end_square_to_move(move_type *move, bitboard_type squares, square_datum_type chessman);
+void add_through_squares_to_castling(move_type *move, bitboard_type squares, square_datum_type king);
+
+bool is_an_example_of_chessman(chessman_type kind_of_chessman, square_datum_type chessman);
+
+condition_type *get_next_condition(move_type *move);
+effect_type *get_next_effect(move_type *move);
+
+move_type *get_next_move_of_moveset(moveset_type *moveset);
+
+square_datum_type own_chessmen(square_datum_type chessman);
+square_datum_type opponent_control(square_datum_type chessman);
+square_datum_type opponent_chessmen(square_datum_type chessman);
+square_datum_type own_castling_blockers(square_datum_type king);
+
+square_datum_type *get_next_datum_from_condition_or_effect(condition_type *condition_or_effect);
+
+bitboard_type get_castling_throughsquares(bitboard_type startsquare, castling_side side);
+bitboard_type get_bit_from_line_move(int f, int r, int distance, line_move line_move_type);
+bitboard_type get_bit_from_coords(int f, int r);
+
+moveset_type *get_moveset_from_coordinates_and_chessman(moveset_type *legal_moves, int f, int r, square_datum_type chessman);
+
+
+    /* globals */
+const square_datum_type line_pieces[] = { white_rook, white_bishop, white_queen, black_rook, black_bishop, black_queen };
+
+
+    /* functions */
 /* generate the rules of chess at a specified location in memory */
-void generate_bitboards(moveset *legal_moves)
+void generate_bitboards(moveset_type *legal_moves)
 {
-    /* loop through board */
-    /* files a to h */
-    for(int f = 0; f < BOARD_WIDTH; f++)
+    for(int f = 0; f < BOARD_WIDTH; f++) /* a-h */
+    for(int r = 0; r < BOARD_WIDTH; r++) /* 8-1 */
     {
-        /* ranks 8 to 1 */
-        for(int r = 0; r < BOARD_WIDTH; r++)
+        bitboard_type startsquare = get_bit_from_coords(f, r);
+
+        generate_line_piece_bitboards (legal_moves, f, r, startsquare);
+        generate_knight_bitboards     (legal_moves, f, r, startsquare);
+        generate_king_bitboards       (legal_moves, f, r, startsquare);
+        generate_pawn_bitboards       (legal_moves, f, r, startsquare);
+    }
+}
+
+void generate_line_piece_bitboards(moveset_type *legal_moves, int f, int r, bitboard_type startsquare)
+{
+    for(int lp = 0; lp < NUMBER_OF_LINE_PIECES; lp++)
+    {
+        square_datum_type line_piece = line_pieces[lp];
+
+        /* get the set of moves from square (f, r) for piece "line_piece" */
+        
+        moveset_type *moveset = 
+            get_moveset_from_coordinates_and_chessman(legal_moves, f, r, line_piece);
+
+        /* loop through directions */
+        for(line_move line_move_type = 0; line_move_type < LINE_MOVE_TYPES; line_move_type++)
         {
-            /* rook, bishop and queen moves */
-            /* loop through all line pieces */
-            for(int lp = 0; lp < NUMBER_OF_LINE_PIECES; lp++)
+            /* rooks can't move diagonally, vice versa for bishops */
+            bool is_diagonal = (bool) (line_move_type & backslash_diagonal & forwardslash_diagonal);
+            if(
+                (is_diagonal && is_an_example_of_chessman(rook, line_piece)) ||
+                (!is_diagonal && is_an_example_of_chessman(bishop, line_piece))
+            ) continue;
+
+            /* loop through end places */
+            for(int end = 0; end < BOARD_WIDTH; end++)
             {
-                square_datum line_piece = line_pieces[lp];
-                /* get the set of moves from square (f, r) for piece "line_piece" */
-                moveset *piece_square = &legal_moves[
-                    /* piece */
-                    NUMBER_OF_SQUARES * line_piece +
-                    /* square */
-                    f + (8 * r)
-                ];
+                /* the rank is used to indicate the start, unless it's a move along a rank */
+                int start = line_move_type == rank ? f : r;
+                int move_distance = end - start;
+                int direction = abs(move_distance) / move_distance;
 
-                /* loop through directions */
-                for(line_move line_move_type = 0; line_move_type < LINE_MOVE_TYPES; line_move_type++)
+                /* moves cannot start and end on the same square */
+                /* or leave the board */
+                if(!move_distance) continue;
+                if(!get_bit_from_line_move(f, r, move_distance, line_move_type)) continue;
+
+                /* add a new move */
+                move_type *move = get_next_move_of_moveset(moveset);
+
+                /* find intermediate squares */
+                bitboard_type intermediate_squares;
+
+                /* distance can be both positive and negative */
+                int distance;
+
+                /* loop through intermediate squares */
+                for(
+                    /* start by moving one square */
+                    distance = direction;
+                    /* don't go the full way, because captures are possible */
+                    distance != move_distance;
+                    distance += direction
+
+                    /* add the current intermediate square to the intermediate squares */
+                ) intermediate_squares |= get_bit_from_line_move(f, r, distance, line_move_type);
+
+                remove_datum_from_squares(move, startsquare, line_piece);
+                add_intermediate_squares_to_move(move, intermediate_squares);
+                add_end_square_to_move(move, get_bit_from_line_move(f, r, distance, line_move_type), line_piece);
+
+                /* make castling impossible when a rook moves away from its start square */
+                if(is_an_example_of_chessman(rook, line_piece))
                 {
-                    /* loop through end places */
-                    for(int end = 0; end < BOARD_WIDTH; end++)
+                    if(is_white(line_piece))
                     {
-                        /* rooks can't move diagonally, vice versa for bishops */
-                        bool is_diagonal = (bool) (line_move_type & backslash_diagonal & forwardslash_diagonal);
-                        if(
-                            (is_diagonal && is_rook[line_piece]) ||
-                            (!is_diagonal && is_bishop[line_piece])
-                        ) continue;
+                        if(startsquare == WHITE_CASTLE_KINGSIDE_ROOKSQUARE)
+                            remove_datum_from_squares(move, WHITE_CASTLE_KINGSIDE_ENDSQUARE, white_castling);
 
-                        /* the rank is used to indicate the start, unless it's a move along a rank */
-                        int start = line_move_type == rank ? f : r;
-                        int move_distance = end - start;
-                        int direction = abs(move_distance) / move_distance;
+                        if(startsquare == WHITE_CASTLE_QUEENSIDE_ROOKSQUARE)
+                            remove_datum_from_squares(move, WHITE_CASTLE_QUEENSIDE_ENDSQUARE, white_castling);
+                    /* black rooks */
+                    }else{
+                        if(startsquare == BLACK_CASTLE_KINGSIDE_ROOKSQUARE)
+                            remove_datum_from_squares(move, BLACK_CASTLE_KINGSIDE_ENDSQUARE, white_castling);
 
-                        /* moves cannot start and end on the same square */
-                        /* or leave the board */
-                        if(!move_distance) continue;
-                        if(!get_bit_from_line_move(f, r, move_distance, line_move_type)) continue;
-
-                        /* add a new move */
-                        move *current_move = &piece_square->moveset[ piece_square->move_count++ ];
-
-                        /* find intermediate squares */
-                        bitboard intermediate_squares;
-                        /* distance can be both positive and negative */
-                        int distance;
-                        /* loop through intermediate squares */
-                        for(
-                            /* start by moving one square */
-                            distance = direction;
-                            /* don't go the full way, because captures are possible */
-                            distance != move_distance;
-                            distance += direction
-
-                          /* add the current intermediate square to the intermediate squares */
-                        ) intermediate_squares |= get_bit_from_line_move(f, r, distance, line_move_type);
-
-                        add_start_square_to_move(current_move, get_bit_from_coords(f, r), line_piece);
-                        add_intermediate_squares_to_move(current_move, intermediate_squares, line_piece);
-                        add_end_square_to_move(current_move, get_bit_from_line_move(f, r, distance, line_move_type), line_piece);
+                        if(startsquare == BLACK_CASTLE_QUEENSIDE_ROOKSQUARE)
+                            remove_datum_from_squares(move, BLACK_CASTLE_QUEENSIDE_ENDSQUARE, white_castling);
                     }
                 }
             }
@@ -118,102 +182,389 @@ void generate_bitboards(moveset *legal_moves)
     }
 }
 
-/* remove the man from the square */
-void add_start_square_to_move(move *current_move, bitboard square, square_datum man)
+void generate_knight_bitboards(moveset_type *legal_moves, int f, int r, bitboard_type startsquare)
 {
-    effect *removal = &current_move->effects[ current_move->effect_count++ ];
-    /* remove */
-    removal->add_piece = false;
-    /* the man */
-    removal->square_data[ removal->data_count++ ] = man;
-    /* from the square*/
-    removal->squares = square;
+    for(square_datum_type knight = white_knight; knight <= black_knight; knight += CHESSMEN_PER_SIDE)
+    {
+        moveset_type *moveset = 
+            get_moveset_from_coordinates_and_chessman(legal_moves, f, r, knight);
+
+        int is_to_right, is_down, is_mostly_file;
+
+        for(int knight_move = 0; knight_move < 8; knight_move++)
+        {
+            is_to_right = knight_move & 1,
+            is_down = knight_move & 2,
+            is_mostly_file = knight_move & 4;
+
+            bitboard_type endsquare = get_bit_from_coords(
+                f + ((is_to_right ? 1 : -1) * (is_mostly_file ? 2 : 1)),
+                r + ((is_down ? 1 : -1) * (is_mostly_file ? 1 : 2))
+            );
+
+            if(endsquare)
+            {
+                move_type *move = get_next_move_of_moveset(moveset);
+
+                remove_datum_from_squares(move, startsquare, knight);
+                add_end_square_to_move(move, endsquare, knight);
+            }
+        }
+    }
 }
 
-/* add a set of squares that must be completely empty */
-void add_intermediate_squares_to_move(move *current_move, bitboard squares, square_datum man)
+void generate_king_bitboards(moveset_type *legal_moves, int f, int r, bitboard_type startsquare)
 {
-    condition * clear_path = &current_move->conditions[ current_move->condition_count++ ];
+    for(square_datum_type king = white_king; king <= black_king; king += CHESSMEN_PER_SIDE)
+    {
+        moveset_type *moveset =
+            get_moveset_from_coordinates_and_chessman(legal_moves, f, r, king);
+
+        int file_movement, rank_movement;
+
+        /* regular king moves */
+        for(int kingmove = 0; kingmove < 9; kingmove++)
+        {
+            file_movement = (kingmove % 3) - 1;
+            rank_movement = (kingmove / 3) - 1;
+
+            if( !(file_movement || rank_movement) ) continue;
+
+            bitboard_type endsquare = get_bit_from_coords(
+                f + file_movement,
+                r + rank_movement
+            );
+
+            if(endsquare)
+            {
+                move_type *move = get_next_move_of_moveset(moveset);
+
+                /* move king */
+                remove_datum_from_squares(move, startsquare, king);
+                add_end_square_to_move(move, endsquare, king);
+                
+                /* can no longer castle */
+                if(startsquare == WHITE_KINGSQUARE && king == white_king)
+                {
+                    remove_datum_from_squares(move, WHITE_CASTLE_KINGSIDE_ENDSQUARE, white_castling);
+                    remove_datum_from_squares(move, WHITE_CASTLE_QUEENSIDE_ENDSQUARE, white_castling);
+                }
+                else if(startsquare == BLACK_KINGSQUARE && king == black_king)
+                {
+                    remove_datum_from_squares(move, BLACK_CASTLE_KINGSIDE_ENDSQUARE, black_castling);
+                    remove_datum_from_squares(move, BLACK_CASTLE_QUEENSIDE_ENDSQUARE, black_castling);
+                }
+
+                /* cannot move into check */
+                /* you can't legally move into check by any means regardless */
+                /* this line exists purely for performance */
+                squares_must_be_free_of(move, endsquare, opponent_control(king));
+            }
+        }
+
+        /* castling */
+        if(
+            (startsquare == WHITE_KINGSQUARE && king == white_king) ||
+            (startsquare == BLACK_KINGSQUARE && king == black_king)
+        )
+        {
+            for(castling_side side = queenside; side <= kingside; side++)
+            {
+                move_type *castling_move = get_next_move_of_moveset(moveset);
+
+                const bitboard_type endsquare =
+                    is_white(king) ?
+                        side == kingside ?
+                            WHITE_CASTLE_KINGSIDE_ENDSQUARE:
+                            WHITE_CASTLE_QUEENSIDE_ENDSQUARE:
+                        side == kingside ?
+                            BLACK_CASTLE_KINGSIDE_ENDSQUARE:
+                            BLACK_CASTLE_QUEENSIDE_ENDSQUARE;
+                
+                const bitboard_type rook_startsquare =
+                    is_white(king) ?
+                        side == kingside ?
+                            WHITE_CASTLE_KINGSIDE_ROOKSQUARE:
+                            WHITE_CASTLE_QUEENSIDE_ROOKSQUARE:
+                        side == kingside ?
+                            BLACK_CASTLE_KINGSIDE_ROOKSQUARE:
+                            BLACK_CASTLE_QUEENSIDE_ROOKSQUARE;
+
+                const bitboard_type rook_endsquare =
+                    side == kingside ?
+                        endsquare << 1:
+                        endsquare >> 1;
+                
+                const square_datum_type own_castling_possible =
+                    is_white(king) ? white_castling : black_castling;
+
+                /* move king */
+                remove_datum_from_squares(castling_move, startsquare, king);
+                add_datum_to_squares(castling_move, endsquare, king);
+
+                /* move rook */
+                remove_datum_from_squares(castling_move, rook_startsquare, white_rook);
+                add_datum_to_squares(castling_move, rook_endsquare, white_rook);
+
+                /* add conditions for squares being passed through */
+                add_through_squares_to_castling(
+                    castling_move,
+                    get_castling_throughsquares(startsquare, kingside),
+                    king
+                );
+
+                /* cannot castle out of check */
+                squares_must_be_free_of(castling_move, startsquare, opponent_control(king));
+
+                /* must still be allowed to castle */
+                squares_must_have(castling_move, endsquare, own_castling_possible);
+            }
+        }
+    }
+}
+
+void generate_pawn_bitboards(moveset_type *legal_moves, int f, int r, bitboard_type startsquare)
+{
+    for(square_datum_type pawn = white_pawn; pawn <= black_pawn; pawn += CHESSMEN_PER_SIDE)
+    {
+        if(pawn_row_invalid(r)) break;
+
+        moveset_type *moveset =
+            get_moveset_from_coordinates_and_chessman(legal_moves, f, r, pawn);
+
+        const int rank_direction = is_white(pawn) ? -1 : 1;
+
+        /* non promotion */
+        if(!pawn_about_to_promote(pawn, r))
+        {
+                /* single step pawn move */
+            bitboard_type single_step_endsquare = get_bit_from_coords(f, r + rank_direction);
+            move_type *single_step = get_next_move_of_moveset(moveset);
+            
+            /* move pawn */
+            remove_datum_from_squares(single_step, startsquare, pawn);
+            add_datum_to_squares(single_step, single_step_endsquare, pawn);
+
+            /* require emptiness at endsquare */
+            add_intermediate_squares_to_move(single_step, single_step_endsquare);
+
+                /* double step pawn move */
+            if(pawn_on_start_row(pawn, r))
+            {
+                bitboard_type double_step_endsquare = get_bit_from_coords(f, r + rank_direction * 2);
+                move_type *double_step = get_next_move_of_moveset(moveset);
+                square_datum_type own_enpassant = 
+                    is_white(pawn) ?
+                        white_enpassant:
+                        black_enpassant;
+
+                /* move_type pawn */
+                remove_datum_from_squares(double_step, startsquare, pawn);
+                add_datum_to_squares(double_step, double_step_endsquare, pawn);
+                
+                /* intermediate and end square must be empty */
+                add_intermediate_squares_to_move(
+                    double_step,
+                    single_step_endsquare | double_step_endsquare
+                );
+
+                /* add possiblity of en passant */
+                add_datum_to_squares(double_step, single_step_endsquare, own_enpassant);
+            }
+
+                /* captures including en passant */
+            for(int capture_direction = -1; capture_direction <= 1; capture_direction += 2)
+            {
+                bitboard_type endsquare = get_bit_from_coords(f + capture_direction, r + rank_direction);
+                if(!endsquare) continue;
+
+                    /* normal captures */
+                move_type *pawn_capture = get_next_move_of_moveset(moveset);
+
+                /* pick up pawn */
+                remove_datum_from_squares(pawn_capture, startsquare, pawn);
+                /* capture and place */
+                add_end_square_to_move(pawn_capture, endsquare, pawn);
+                /* must be a capture */
+                squares_must_have(pawn_capture, endsquare, opponent_chessmen(pawn));
+
+                    /* en passant */
+                if( !can_enpassant(pawn, r) ) continue;
+
+                square_datum_type opponent_enpassant = 
+                    is_white(pawn) ?
+                        black_enpassant:
+                        white_enpassant;
+                
+                square_datum_type opponent_pawn = 
+                    is_white(pawn) ?
+                        black_pawn:
+                        black_pawn;
+                
+                bitboard_type enpassant_capture_square = get_bit_from_coords(f + capture_direction, r);
+                
+                move_type *enpassant = get_next_move_of_moveset(moveset);
+
+                /* move_type pawn */
+                remove_datum_from_squares(enpassant, startsquare, pawn);
+                add_datum_to_squares(enpassant, endsquare, pawn);
+
+                /* require en passant to be possible */
+                squares_must_have(enpassant, endsquare, opponent_enpassant);
+
+                /* perform capture */
+                remove_datum_from_squares(enpassant, enpassant_capture_square, opponent_pawn);
+            }
+        }
+
+        /* promotion */
+        else
+        {
+            for(square_datum_type p = white_rook; p <= white_queen; p++)
+            {
+                square_datum_type promotion_piece = p + (is_white(pawn) ? 0 : CHESSMEN_PER_SIDE);
+                
+                    /* single step pawn move_type */
+                bitboard_type single_step_endsquare = get_bit_from_coords(f, r + rank_direction);
+                move_type *single_step = get_next_move_of_moveset(moveset);
+                
+                /* promote pawn */
+                remove_datum_from_squares(single_step, startsquare, pawn);
+                add_datum_to_squares(single_step, single_step_endsquare, promotion_piece);
+
+                /* require emptiness at endsquare */
+                add_intermediate_squares_to_move(single_step, single_step_endsquare);
+
+                    /* captures */
+                for(int capture_direction = -1; capture_direction <= 1; capture_direction += 2)
+                {
+                    bitboard_type endsquare = get_bit_from_coords(f + capture_direction, r + rank_direction);
+                    if(!endsquare) continue;
+
+                        /* normal captures */
+                    move_type *pawn_capture = get_next_move_of_moveset(moveset);
+
+                    /* pick up pawn */
+                    remove_datum_from_squares(pawn_capture, startsquare, pawn);
+                    /* capture and promote */
+                    add_end_square_to_move(pawn_capture, endsquare, promotion_piece);
+                    /* must be a capture */
+                    squares_must_have(pawn_capture, endsquare, opponent_chessmen(pawn));
+                }
+            }
+        }
+    }
+}
+
+void add_single_effect(move_type *move, bitboard_type squares, square_datum_type chessman, bool is_addition)
+{
+    effect_type *effect = get_next_effect(move);
+
+    effect->datum = chessman;
+
+    effect->fill = is_addition;
+    effect->squares = squares;
+}
+
+void add_single_condition(move_type *move, bitboard_type squares, square_datum_type chessman, bool must_be_filled)
+{
+    condition_type *condition = get_next_condition(move);
+
+    condition->datum = chessman;
+    
+    condition->fill = must_be_filled;
+    condition->squares = squares;
+}
+
+void remove_datum_from_squares(move_type *move, bitboard_type squares, square_datum_type chessman) lambda
+    (add_single_effect(move, squares, chessman, false))
+
+void add_datum_to_squares(move_type *move, bitboard_type squares, square_datum_type chessman) lambda
+    (add_single_effect(move, squares, chessman, true))
+
+void squares_must_be_free_of(move_type *move, bitboard_type squares, square_datum_type chessman) lambda
+    (add_single_condition(move, squares, chessman, false))
+
+void squares_must_have(move_type *move, bitboard_type squares, square_datum_type chessman) lambda
+    (add_single_condition(move, squares, chessman, false))
+
+/* add a set of squares that must be completely empty */
+void add_intermediate_squares_to_move(move_type *move, bitboard_type squares)
+{
+    condition_type * clear_path = get_next_condition(move);
+
     /* intermediate squares */
     clear_path->squares = squares;
+    
     /* must be empty */
-    clear_path->must_be_empty = true;
+    clear_path->fill = false;
+    
     /* of any pieces */
-    add_data_to_condition_or_effect(white_men, MEN_PER_SIDE, clear_path->square_data, &clear_path->data_count);
-    add_data_to_condition_or_effect(black_men, MEN_PER_SIDE, clear_path->square_data, &clear_path->data_count);
+    clear_path->datum = chessmen;
 }
+
+void add_through_squares_to_castling(move_type *move, bitboard_type squares, square_datum_type king)
+{
+    condition_type *clear_path = get_next_condition(move);
+
+    clear_path->squares = squares;
+    clear_path->fill = false;
+    clear_path->datum = own_castling_blockers(king);
+}
+
+bitboard_type get_castling_throughsquares(bitboard_type startsquare, castling_side side) lambda
+(  
+    side == kingside ?
+    (startsquare >> 1) | (startsquare >> 2) :
+    (startsquare << 1) | (startsquare << 2)
+)
 
 /* add a set of squares where all opponent pieces will be removed and the current piece will be added */
 /* and no pieces of the same colour may be present */
-void add_end_square_to_move(move *current_move, bitboard square, square_datum man)
+void add_end_square_to_move(move_type *move, bitboard_type squares, square_datum_type chessman)
 {
-    effect *placement = &current_move->effects[ current_move->effect_count++ ];
-    /* add */
-    placement->add_piece = true;
-    /* the piece */
-    placement->square_data[ placement->data_count++ ] = man;
-    /* to the current piece */
-    placement->squares = square;
+    /* place piece down */
+    add_datum_to_squares(move, squares, chessman);
 
-    effect * capture = &current_move->effects[ current_move->effect_count++ ];
-    /* remove */
-    capture->add_piece = false;
-    /* opponent's pieces */
-    add_data_to_condition_or_effect(
-        opponent_men(man), MEN_PER_SIDE, capture->square_data, &capture->data_count);
-    /* from the square */
-    capture->squares = square;
+    /* capture */
+    effect_type * capture = get_next_effect(move);
+    capture->fill = false;
+    capture->squares = squares;
+    capture->datum = opponent_chessmen(chessman);
 
-    condition * free_of_own_pieces = &current_move->conditions[ current_move->condition_count++ ];
-    /* cannot */
-    free_of_own_pieces->must_be_empty = true;
-    /* move onto */
-    free_of_own_pieces->squares = square;
-    /* your own pieces */
-    add_data_to_condition_or_effect(
-        own_men(man),  MEN_PER_SIDE, free_of_own_pieces->square_data, &free_of_own_pieces->data_count);
+    /* cannot capture own pieces */
+    condition_type * free_of_own_pieces = get_next_condition(move);
+    free_of_own_pieces->fill = true;
+    free_of_own_pieces->squares = squares;
+    free_of_own_pieces->datum = own_chessmen(chessman);
 }
 
-/* add multiple pieces or other square data to a condition or effect */
-void add_data_to_condition_or_effect(
-    square_datum *square_data,
-    int data_count,
-    square_datum *condition_or_effect_data,
-    int *condition_or_effect_data_count
-){
-    for(int i = 0; i < data_count; i++)
-        add_datum_to_condition_or_effect(square_data[i], condition_or_effect_data, condition_or_effect_data_count);
-}
+effect_type *get_next_effect(move_type * move) lambda
+    (&move->effects[ move->effect_count++ ])
 
-void add_datum_to_condition_or_effect(
-    square_datum the_square_datum,
-    square_datum *condition_or_effect_data,
-    int *condition_or_effect_data_count
-){
-    condition_or_effect_data[ *condition_or_effect_data_count++ ] = the_square_datum;
-}
+condition_type *get_next_condition(move_type *move) lambda
+    (&move->conditions[ move->condition_count++ ])
 
-bool is_white(square_datum man)
-{
-    return man <= MAX_WHITE_MAN_INDEX;
-}
+bool is_an_example_of_chessman(chessman_type that_kind_of_chessman, square_datum_type chessman) lambda
+(
+    chessman                     == that_kind_of_chessman ||
+    chessman - CHESSMEN_PER_SIDE == that_kind_of_chessman 
+)
 
-square_datum *own_men(square_datum man)
-{
-    return is_white(man)?
-        white_men:
-        black_men;
-}
+square_datum_type own_chessmen(square_datum_type chessman) lambda
+    (is_white(chessman) ? white_chessmen : black_chessmen)
 
-square_datum *opponent_men(square_datum man)
-{
-    return is_white(man)?
-        black_men:
-        white_men;
-}
+square_datum_type opponent_control(square_datum_type chessman) lambda
+    (is_white(chessman) ? white_control : black_control)
+
+square_datum_type opponent_chessmen(square_datum_type chessman) lambda
+    (is_white(chessman) ? black_chessmen : white_chessmen)
+
+square_datum_type own_castling_blockers(square_datum_type king) lambda
+    (is_white(king) ? white_castling_blockers : black_castling_blockers)
 
 /* return a bitboard with a 1 at the end of a line move */
-bitboard get_bit_from_line_move(int f, int r, int distance, line_move line_move_type)
+bitboard_type get_bit_from_line_move(int f, int r, int distance, line_move line_move_type)
 {
     switch (line_move_type)
     {
@@ -237,21 +588,29 @@ bitboard get_bit_from_line_move(int f, int r, int distance, line_move line_move_
                 get_bit_from_coords(f + distance, r - distance):
                 get_bit_from_coords(f - distance, r + distance);
     }
-    printf("Move generation error - meaningless line piece move");
     return 0;
 }
 
 /* return a bitboard with a 1 at specified coordinates */
-bitboard get_bit_from_coords(int f, int r)
-{
+bitboard_type get_bit_from_coords(int f, int r) lambda
+(
     /* if the move is off of the board */
-    if((f | r) & -8) return 0;
+    ((f | r) & -8) ? 0 :
+
     /* 
      * eg. for h1: 
-     * f and h are 7
+     * f and r are 7
      * 7 + 7 * 8 = 63
      * 63 - 63 = 0
      * correctly returns 1ul - the last bit
      */
-    return 1ull << (63 - (f + 8 * r));
-}
+    1ull << (63 - (f + 8 * r))
+)
+
+move_type *get_next_move_of_moveset(moveset_type *moveset) lambda
+    (&moveset->moves[ moveset->move_count++ ])
+
+moveset_type *get_moveset_from_coordinates_and_chessman(moveset_type * legal_moves, int f, int r, square_datum_type chessman) lambda
+(
+    &(&legal_moves[chessman * NUMBER_OF_SQUARES])[f + (8 * r)]
+)
