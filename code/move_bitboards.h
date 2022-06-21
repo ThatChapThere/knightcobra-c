@@ -4,7 +4,7 @@
     #define _MOVE_BITBOARDS_H_
 
     /* all 12 pieces, plus castling, en passant and control for both sides */
-    #define NUMBER_OF_SQUARE_DATA_TYPES chessmen
+    #define NUMBER_OF_SQUARE_DATA_TYPES (chessmen + 1)
 
     #define NUMBER_OF_CHESSMEN 12
     #define CHESSMEN_PER_SIDE 6

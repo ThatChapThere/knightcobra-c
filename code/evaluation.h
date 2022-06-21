@@ -3,6 +3,6 @@
 #ifndef _EVALUATION_H_
     #define _EVALUATION_H_
     
-    float evaluate_position(position pos);
+    float evaluate_position(position_type pos);
 
 #endif

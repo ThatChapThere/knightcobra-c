@@ -14,5 +14,6 @@
     } node_type;
 
     void add_legal_moves_to_node(node_type *node, moveset_type *legal_moves);
+    void free_node(node_type *node);
 
 #endif

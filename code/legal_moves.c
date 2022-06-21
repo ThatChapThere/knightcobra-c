@@ -1,6 +1,12 @@
+#include <stdlib.h>
+#include <stdio.h>
 #include "legal_moves.h"
 #include "move_bitboards.h"
 #include "stdbool.h"
+
+
+node_type **get_next_child_of_node(node_type *node);
+
 
 void add_legal_moves_to_node(node_type *node, moveset_type *legal_moves)
 {
@@ -10,7 +16,7 @@ void add_legal_moves_to_node(node_type *node, moveset_type *legal_moves)
     for(square_datum_type cm = white_pawn; cm <= white_king; cm++)
     {
         square_datum_type chessman = 
-            cm + 
+            cm +
             (
                 position.player_to_move == white_player ?
                 0: 
@@ -23,9 +29,12 @@ void add_legal_moves_to_node(node_type *node, moveset_type *legal_moves)
         for(int sq = 0; sq < 64; sq++)
         {
             /* if there isn't one, skip this iteration */
-            if(!((chessman_bitboard >> (63 - sq)) & 1)) continue;
+            if(! ((chessman_bitboard >> (63 - sq)) & 1) ) continue;
 
-            moveset_type moveset = (&legal_moves[chessman * NUMBER_OF_SQUARES])[sq];
+            moveset_type moveset = legal_moves[
+                chessman * NUMBER_OF_SQUARES +
+                sq
+            ];
 
             for(int m = 0; m < moveset.move_count; m++)
             {
@@ -53,40 +62,40 @@ void add_legal_moves_to_node(node_type *node, moveset_type *legal_moves)
                         if(position.bitboards[condition.datum] & condition.squares)
                             is_legal = false;
                     }
+                }
 
-                    if(is_legal)
+                if(is_legal)
+                {
+                    node_type **child = get_next_child_of_node(node);
+                    *child = malloc(sizeof(node_type));
+                    position_type *new_position = &(*child)->position;
+                    copy_position_to(
+                        node->position,
+                        new_position
+                    );
+                    new_position->fifty_move_counter++;
+                    new_position->player_to_move ^= true;
+
+                    bool is_capture = false;
+
+                    for(int e = 0; e < move.effect_count; e++)
                     {
-                        node_type **child = get_next_child_of_node(node);
-                        *child = malloc(sizeof(node));
-                        position_type *new_position = &(*child)->position;
-                        copy_position_to(
-                            node->position,
-                            new_position
-                        );
-                        new_position->fifty_move_counter++;
-                        new_position->player_to_move ^= 1;
+                        effect_type effect = move.effects[e];
 
-                        bool is_capture = false;
-
-                        for(int e = 0; e < move.effect_count; e++)
+                        if(effect.fill)
+                            new_position->bitboards[effect.datum] |= effect.squares;
+                        else
                         {
-                            effect_type effect = move.effects[e];
-
-                            if(effect.fill)
-                                new_position->bitboards[effect.datum] |= effect.squares;
-                            else
-                            {
-                                new_position->bitboards[effect.datum] &= ~effect.squares;
-                                if(is_chessman(effect.datum)) is_capture = true;
-                            }
+                            new_position->bitboards[effect.datum] &= ~effect.squares;
+                            if(is_chessman(effect.datum)) is_capture = true;
                         }
-
-                        if(
-                            chessman == white_pawn ||
-                            chessman == black_pawn ||
-                            is_capture
-                        ) new_position->fifty_move_counter = 0;
                     }
+
+                    if(
+                        chessman == white_pawn ||
+                        chessman == black_pawn ||
+                        is_capture
+                    ) new_position->fifty_move_counter = 0;
                 }
             }
         }

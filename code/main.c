@@ -3,6 +3,7 @@
 #include <time.h>
 #include "move_bitboards.h"
 #include "legal_moves.h"
+#include "position.h"
 
 int main()
 {
@@ -16,62 +17,30 @@ int main()
     );
     
     generate_bitboards(legal_moves);
-    
-    /* loop through squares */
-    for(int i = 0; i < 64; i++)
-    {
-        /* board to be displayed */
-        char show_legal_moves[64];
-
-        /* fill with spaces */
-        for(int j = 0; j < 64; j++)
-            show_legal_moves[j] = '_';
-        
-        /* set start square */
-        show_legal_moves[i] = 'X';
-        
-        /* find all queen moves from this square */
-        moveset_type moves = legal_moves[
-            white_pawn * NUMBER_OF_SQUARES +
-            i
-        ];
-        
-        /* loop through queen moves from square i */
-        for(int j = 0; j < moves.move_count; j++)
-        {
-            move_type currentmove = moves.moves[j];
-            /* loop through effects of move j */
-            for(int k = 0; k < currentmove.effect_count; k++)
-            {
-                /* ignore pieces being added */
-                if(!currentmove.effects[k].fill) continue;
-
-                /* this is okay since bitboard_type is a typedef of an integer - which is copied by assignment */
-                bitboard_type effect = currentmove.effects[k].squares;
-
-                int most_sig_bit = 63;
-                /* eg. for h1: effect = 1, the while loop does nothing, most_sig_bit is correctly 63 */
-                while(effect >>= 1) most_sig_bit--;
-                show_legal_moves[most_sig_bit] = 'o';
-            }
-        }
-
-        /* display moveset from square i */
-        for(int j = 0; j < 64; j++)
-        {
-            if(j % 8){}else printf("\n");
-            printf("%c", show_legal_moves[j]);
-        }
-
-        printf("\n");
-    }
-    
-    free(legal_moves);
 
     time_t end_time = clock();
+    printf("%d ms taken to generate bitboards\n\n", (int) difftime(end_time, start_time));
 
-    printf("%d ms\n", (int) difftime(end_time, start_time));
+    position_type test_position;
 
+    set_position_from_fen(&test_position, STARTING_FEN);
+
+    print_position(test_position);
+
+    node_type test_node;
+    test_node.position = test_position;
+    test_node.child_count = 0;
+
+    add_legal_moves_to_node(&test_node, legal_moves);
+
+    printf("\n%d legal moves available\n\n", test_node.child_count);
+
+    for(int i = 0; i < test_node.child_count; i++)
+        print_position(test_node.children[i]->position);
+
+    free_node(&test_node);
+
+    free(legal_moves);
     getchar();
     return 0;
 }

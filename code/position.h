@@ -1,7 +1,7 @@
 #include "move_bitboards.h"
 
 #ifndef _POSITION_H_
-    #define _POSITION_H
+    #define _POSITION_H_
 
     #define STARTING_FEN "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1"
 
@@ -16,5 +16,6 @@
 
     void set_position_from_fen(position_type *current_position, char *fen);
     void copy_position_to(position_type position_to_copy, position_type *position_to_copy_to);
+    void print_position(position_type position);
 
 #endif
