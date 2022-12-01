@@ -28,54 +28,27 @@
 
 #define is_white(chessman) (chessman <= MAX_WHITE_MAN_INDEX)
 
-typedef enum{ pawn, rook, knight, bishop, queen, king } chessman_type;
-
 typedef enum {
     file, rank, backslash_diagonal, forwardslash_diagonal
 } line_move;
 
-typedef enum { queenside, kingside } castling_side;
-
-/* function declarations */
-void generate_line_piece_bitboards (moveset_type *legal_moves, int f, int r, bitboard_type startsquare);
-void generate_knight_bitboards     (moveset_type *legal_moves, int f, int r, bitboard_type startsquare);
-void generate_king_bitboards       (moveset_type *legal_moves, int f, int r, bitboard_type startsquare);
-void generate_pawn_bitboards       (moveset_type *legal_moves, int f, int r, bitboard_type startsquare);
-
-void add_single_effect(move_type *move, bitboard_type squares, square_datum_type chessman, bool is_addition);
-void add_datum_to_squares(move_type *move, bitboard_type squares, square_datum_type chessman);
-void remove_datum_from_squares(move_type *move, bitboard_type squares, square_datum_type chessman);
-
-void add_single_condition(move_type *move, bitboard_type squares, square_datum_type chessman, bool must_be_filled);
-void squares_must_have(move_type *move, bitboard_type squares, square_datum_type chessman);
-void squares_must_be_free_of(move_type *move, bitboard_type squares, square_datum_type chessman);
-
-void add_intermediate_squares_to_move(move_type *move, bitboard_type squares);
-void add_end_square_to_move(move_type *move, bitboard_type squares, square_datum_type chessman);
-void add_through_squares_to_castling(move_type *move, bitboard_type squares, square_datum_type king);
-
-bool is_an_example_of_chessman(chessman_type kind_of_chessman, square_datum_type chessman);
+typedef enum {queenside, kingside} castling_side;
 
 condition_type *get_next_condition(move_type *move);
 effect_type *get_next_effect(move_type *move);
-
 move_type *get_next_move_of_moveset(moveset_type *moveset);
-
 square_datum_type own_chessmen(square_datum_type chessman);
 square_datum_type opponent_control(square_datum_type chessman);
 square_datum_type opponent_chessmen(square_datum_type chessman);
 square_datum_type own_castling_blockers(square_datum_type king);
-
 square_datum_type *get_next_datum_from_condition_or_effect(condition_type *condition_or_effect);
-
 bitboard_type get_castling_throughsquares(bitboard_type startsquare, castling_side side);
 bitboard_type get_bit_from_line_move(int f, int r, int distance, line_move line_move_type);
 bitboard_type get_bit_from_coords(int f, int r);
-
 moveset_type *get_moveset_from_coordinates_and_chessman(moveset_type *legal_moves, int f, int r, square_datum_type chessman);
 
 /* line piece indeces */
-const square_datum_type line_pieces[] = { white_rook, white_bishop, white_queen, black_rook, black_bishop, black_queen };
+const square_datum_type line_pieces[] = {white_rook, white_bishop, white_queen, black_rook, black_bishop, black_queen};
 
 /* function bodies */
 void generate_bitboards(moveset_type *legal_moves)
@@ -519,8 +492,8 @@ bool is_an_example_of_chessman(chessman_type that_kind_of_chessman, square_datum
     chessman - CHESSMEN_PER_SIDE == that_kind_of_chessman;
 }
 
-square_datum_type own_chessmen(square_datum_type chessman){return
-    is_white(chessman) ? white_chessmen : black_chessmen;}
+square_datum_type own_chessmen(square_datum_type chessman){
+	return is_white(chessman) ? white_chessmen : black_chessmen;}
 
 square_datum_type opponent_control(square_datum_type chessman){return
     is_white(chessman) ? white_control : black_control;}

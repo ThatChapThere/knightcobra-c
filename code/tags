@@ -1,0 +1,161 @@
+!_TAG_FILE_FORMAT	2	/extended format; --format=1 will not append ;" to lines/
+!_TAG_FILE_SORTED	1	/0=unsorted, 1=sorted, 2=foldcase/
+!_TAG_OUTPUT_EXCMD	mixed	/number, pattern, mixed, or combineV2/
+!_TAG_OUTPUT_FILESEP	slash	/slash or backslash/
+!_TAG_OUTPUT_MODE	u-ctags	/u-ctags or e-ctags/
+!_TAG_PATTERN_LENGTH_LIMIT	96	/0 for no limit/
+!_TAG_PROC_CWD	/home/tim/repos/knightcobra-c/code/	//
+!_TAG_PROGRAM_AUTHOR	Universal Ctags Team	//
+!_TAG_PROGRAM_NAME	Universal Ctags	/Derived from Exuberant Ctags/
+!_TAG_PROGRAM_URL	https://ctags.io/	/official site/
+!_TAG_PROGRAM_VERSION	5.9.0	/p5.9.20220828.0/
+A8	position.c	/^#define A8 /;"	d	file:
+BLACK_CASTLE_KINGSIDE_ENDSQUARE	move_bitboards.c	/^#define BLACK_CASTLE_KINGSIDE_ENDSQUARE /;"	d	file:
+BLACK_CASTLE_KINGSIDE_ROOKSQUARE	move_bitboards.c	/^#define BLACK_CASTLE_KINGSIDE_ROOKSQUARE /;"	d	file:
+BLACK_CASTLE_QUEENSIDE_ENDSQUARE	move_bitboards.c	/^#define BLACK_CASTLE_QUEENSIDE_ENDSQUARE /;"	d	file:
+BLACK_CASTLE_QUEENSIDE_ROOKSQUARE	move_bitboards.c	/^#define BLACK_CASTLE_QUEENSIDE_ROOKSQUARE /;"	d	file:
+BLACK_KINGSQUARE	move_bitboards.c	/^#define BLACK_KINGSQUARE /;"	d	file:
+BOARD_WIDTH	move_bitboards.c	/^#define BOARD_WIDTH /;"	d	file:
+CHESSMEN_PER_SIDE	move_bitboards.h	/^    #define CHESSMEN_PER_SIDE /;"	d
+LINE_MOVE_TYPES	move_bitboards.c	/^#define LINE_MOVE_TYPES /;"	d	file:
+MAX_BLACK_MAN_INDEX	move_bitboards.h	/^    #define MAX_BLACK_MAN_INDEX /;"	d
+MAX_CONDITIONS	move_bitboards.h	/^    #define MAX_CONDITIONS /;"	d
+MAX_EFFECTS	move_bitboards.h	/^    #define MAX_EFFECTS /;"	d
+MAX_LEGAL_MOVES	legal_moves.h	/^    #define MAX_LEGAL_MOVES /;"	d
+MAX_MOVES_PER_CHESSMAN	move_bitboards.h	/^    #define MAX_MOVES_PER_CHESSMAN /;"	d
+MAX_WHITE_MAN_INDEX	move_bitboards.h	/^    #define MAX_WHITE_MAN_INDEX /;"	d
+MIN_BLACK_MAN_INDEX	move_bitboards.h	/^    #define MIN_BLACK_MAN_INDEX /;"	d
+MIN_WHITE_MAN_INDEX	move_bitboards.h	/^    #define MIN_WHITE_MAN_INDEX /;"	d
+NUMBER_OF_CHESSMEN	move_bitboards.h	/^    #define NUMBER_OF_CHESSMEN /;"	d
+NUMBER_OF_DIAGONAL_PIECES	move_bitboards.c	/^#define NUMBER_OF_DIAGONAL_PIECES /;"	d	file:
+NUMBER_OF_LINE_PIECES	move_bitboards.c	/^#define NUMBER_OF_LINE_PIECES /;"	d	file:
+NUMBER_OF_SQUARES	move_bitboards.h	/^    #define NUMBER_OF_SQUARES /;"	d
+NUMBER_OF_SQUARE_DATA_TYPES	move_bitboards.h	/^    #define NUMBER_OF_SQUARE_DATA_TYPES /;"	d
+NUMBER_OF_STRAIGHT_PIECES	move_bitboards.c	/^#define NUMBER_OF_STRAIGHT_PIECES /;"	d	file:
+STARTING_FEN	position.h	/^    #define STARTING_FEN /;"	d
+WHITE_CASTLE_KINGSIDE_ENDSQUARE	move_bitboards.c	/^#define WHITE_CASTLE_KINGSIDE_ENDSQUARE /;"	d	file:
+WHITE_CASTLE_KINGSIDE_ROOKSQUARE	move_bitboards.c	/^#define WHITE_CASTLE_KINGSIDE_ROOKSQUARE /;"	d	file:
+WHITE_CASTLE_QUEENSIDE_ENDSQUARE	move_bitboards.c	/^#define WHITE_CASTLE_QUEENSIDE_ENDSQUARE /;"	d	file:
+WHITE_CASTLE_QUEENSIDE_ROOKSQUARE	move_bitboards.c	/^#define WHITE_CASTLE_QUEENSIDE_ROOKSQUARE /;"	d	file:
+WHITE_KINGSQUARE	move_bitboards.c	/^#define WHITE_KINGSQUARE /;"	d	file:
+_EVALUATION_H_	evaluation.h	/^    #define _EVALUATION_H_$/;"	d
+_LEGAL_MOVES_H_	legal_moves.h	/^    #define _LEGAL_MOVES_H_$/;"	d
+_MOVE_BITBOARDS_H_	move_bitboards.h	/^    #define _MOVE_BITBOARDS_H_$/;"	d
+_POSITION_H_	position.h	/^    #define _POSITION_H_$/;"	d
+__anon46b917900103	position.h	/^    typedef enum { black_player, white_player } player;$/;"	g
+__anon46b917900208	position.h	/^    {$/;"	s
+__anonc14435260103	move_bitboards.c	/^typedef enum{ pawn, rook, knight, bishop, queen, king } chessman_type;$/;"	g	file:
+__anonc14435260203	move_bitboards.c	/^typedef enum {$/;"	g	file:
+__anonc14435260303	move_bitboards.c	/^typedef enum { queenside, kingside } castling_side;$/;"	g	file:
+__anonc144352b0103	move_bitboards.h	/^    typedef enum {$/;"	g
+__anonc144352b0208	move_bitboards.h	/^    typedef struct {$/;"	s
+__anonc144352b0308	move_bitboards.h	/^    typedef struct {$/;"	s
+__anonc144352b0408	move_bitboards.h	/^    typedef struct {$/;"	s
+add_datum_to_squares	move_bitboards.c	/^void add_datum_to_squares(move_type *move, bitboard_type squares, square_datum_type chessman)$/;"	f	typeref:typename:void
+add_end_square_to_move	move_bitboards.c	/^void add_end_square_to_move(move_type *move, bitboard_type squares, square_datum_type chessman)$/;"	f	typeref:typename:void
+add_intermediate_squares_to_move	move_bitboards.c	/^void add_intermediate_squares_to_move(move_type *move, bitboard_type squares)$/;"	f	typeref:typename:void
+add_legal_moves_to_node	legal_moves.c	/^void add_legal_moves_to_node(node_type *node, moveset_type *legal_moves)$/;"	f	typeref:typename:void
+add_single_condition	move_bitboards.c	/^void add_single_condition(move_type *move, bitboard_type squares, square_datum_type chessman, bo/;"	f	typeref:typename:void
+add_single_effect	move_bitboards.c	/^void add_single_effect(move_type *move, bitboard_type squares, square_datum_type chessman, bool /;"	f	typeref:typename:void
+add_through_squares_to_castling	move_bitboards.c	/^void add_through_squares_to_castling(move_type *move, bitboard_type squares, square_datum_type k/;"	f	typeref:typename:void
+backslash_diagonal	move_bitboards.c	/^    file, rank, backslash_diagonal, forwardslash_diagonal$/;"	e	enum:__anonc14435260203	file:
+bishop	move_bitboards.c	/^typedef enum{ pawn, rook, knight, bishop, queen, king } chessman_type;$/;"	e	enum:__anonc14435260103	file:
+bitboard_type	move_bitboards.h	/^    typedef unsigned long long int bitboard_type;$/;"	t	typeref:typename:unsigned long long int
+bitboards	position.h	/^        bitboard_type bitboards[NUMBER_OF_SQUARE_DATA_TYPES];$/;"	m	struct:__anon46b917900208	typeref:typename:bitboard_type[]
+black_bishop	move_bitboards.h	/^        black_pawn, black_rook, black_knight, black_bishop, black_queen, black_king,$/;"	e	enum:__anonc144352b0103
+black_castling	move_bitboards.h	/^        white_castling, black_castling,$/;"	e	enum:__anonc144352b0103
+black_castling_blockers	move_bitboards.h	/^        white_castling_blockers, black_castling_blockers,$/;"	e	enum:__anonc144352b0103
+black_chessmen	move_bitboards.h	/^        white_chessmen, black_chessmen,$/;"	e	enum:__anonc144352b0103
+black_control	move_bitboards.h	/^        white_control, black_control,$/;"	e	enum:__anonc144352b0103
+black_enpassant	move_bitboards.h	/^        white_enpassant, black_enpassant,$/;"	e	enum:__anonc144352b0103
+black_king	move_bitboards.h	/^        black_pawn, black_rook, black_knight, black_bishop, black_queen, black_king,$/;"	e	enum:__anonc144352b0103
+black_knight	move_bitboards.h	/^        black_pawn, black_rook, black_knight, black_bishop, black_queen, black_king,$/;"	e	enum:__anonc144352b0103
+black_pawn	move_bitboards.h	/^        black_pawn, black_rook, black_knight, black_bishop, black_queen, black_king,$/;"	e	enum:__anonc144352b0103
+black_player	position.h	/^    typedef enum { black_player, white_player } player;$/;"	e	enum:__anon46b917900103
+black_queen	move_bitboards.h	/^        black_pawn, black_rook, black_knight, black_bishop, black_queen, black_king,$/;"	e	enum:__anonc144352b0103
+black_rook	move_bitboards.h	/^        black_pawn, black_rook, black_knight, black_bishop, black_queen, black_king,$/;"	e	enum:__anonc144352b0103
+can_enpassant	move_bitboards.c	/^#define can_enpassant(/;"	d	file:
+castling_side	move_bitboards.c	/^typedef enum { queenside, kingside } castling_side;$/;"	t	typeref:enum:__anonc14435260303	file:
+chessman_characters	position.c	/^const char chessman_characters[] = "PRNBQKprnbqk";$/;"	v	typeref:typename:const char[]
+chessman_type	move_bitboards.c	/^typedef enum{ pawn, rook, knight, bishop, queen, king } chessman_type;$/;"	t	typeref:enum:__anonc14435260103	file:
+chessmen	move_bitboards.h	/^        chessmen$/;"	e	enum:__anonc144352b0103
+child_count	legal_moves.h	/^        int child_count;$/;"	m	struct:node_type	typeref:typename:int
+children	legal_moves.h	/^        node_type *children[MAX_LEGAL_MOVES];$/;"	m	struct:node_type	typeref:typename:node_type * []
+condition_count	move_bitboards.h	/^        int condition_count;$/;"	m	struct:__anonc144352b0308	typeref:typename:int
+condition_type	move_bitboards.h	/^    } condition_type;$/;"	t	typeref:struct:__anonc144352b0208
+conditions	move_bitboards.h	/^        condition_type conditions[MAX_CONDITIONS];$/;"	m	struct:__anonc144352b0308	typeref:typename:condition_type[]
+copy_position_to	position.c	/^void copy_position_to(position_type position_to_copy, position_type *position_to_copy_to)$/;"	f	typeref:typename:void
+data_count	move_bitboards.h	/^        int data_count;$/;"	m	struct:__anonc144352b0208	typeref:typename:int
+datum	move_bitboards.h	/^        square_datum_type datum; \/* the datum that the square must (not) contain *\/$/;"	m	struct:__anonc144352b0208	typeref:typename:square_datum_type
+effect_count	move_bitboards.h	/^        int effect_count;$/;"	m	struct:__anonc144352b0308	typeref:typename:int
+effect_type	move_bitboards.h	/^    typedef condition_type effect_type;$/;"	t	typeref:typename:condition_type
+effects	move_bitboards.h	/^        effect_type effects[MAX_EFFECTS];$/;"	m	struct:__anonc144352b0308	typeref:typename:effect_type[]
+fifty_move_counter	position.h	/^        int fifty_move_counter;$/;"	m	struct:__anon46b917900208	typeref:typename:int
+file	move_bitboards.c	/^    file, rank, backslash_diagonal, forwardslash_diagonal$/;"	e	enum:__anonc14435260203	file:
+fill	move_bitboards.h	/^        bool fill; \/* if 0, the square must be empty for a move to be legal; if 1 the square mu/;"	m	struct:__anonc144352b0208	typeref:typename:bool
+forwardslash_diagonal	move_bitboards.c	/^    file, rank, backslash_diagonal, forwardslash_diagonal$/;"	e	enum:__anonc14435260203	file:
+free_node	legal_moves.c	/^void free_node(node_type *node)$/;"	f	typeref:typename:void
+generate_bitboards	move_bitboards.c	/^void generate_bitboards(moveset_type *legal_moves)$/;"	f	typeref:typename:void
+generate_king_bitboards	move_bitboards.c	/^void generate_king_bitboards(moveset_type *legal_moves, int f, int r, bitboard_type startsquare)$/;"	f	typeref:typename:void
+generate_knight_bitboards	move_bitboards.c	/^void generate_knight_bitboards(moveset_type *legal_moves, int f, int r, bitboard_type startsquar/;"	f	typeref:typename:void
+generate_line_piece_bitboards	move_bitboards.c	/^void generate_line_piece_bitboards(moveset_type *legal_moves, int f, int r, bitboard_type starts/;"	f	typeref:typename:void
+generate_pawn_bitboards	move_bitboards.c	/^void generate_pawn_bitboards(moveset_type *legal_moves, int f, int r, bitboard_type startsquare)$/;"	f	typeref:typename:void
+get_bit_from_coords	move_bitboards.c	/^bitboard_type get_bit_from_coords(int f, int r)$/;"	f	typeref:typename:bitboard_type
+get_bit_from_line_move	move_bitboards.c	/^bitboard_type get_bit_from_line_move(int f, int r, int distance, line_move line_move_type)$/;"	f	typeref:typename:bitboard_type
+get_castling_throughsquares	move_bitboards.c	/^bitboard_type get_castling_throughsquares(bitboard_type startsquare, castling_side side)$/;"	f	typeref:typename:bitboard_type
+get_moveset_from_coordinates_and_chessman	move_bitboards.c	/^moveset_type *get_moveset_from_coordinates_and_chessman(moveset_type * legal_moves, int f, int r/;"	f	typeref:typename:moveset_type *
+get_next_child_of_node	legal_moves.c	/^node_type **get_next_child_of_node(node_type *node)$/;"	f	typeref:typename:node_type **
+get_next_condition	move_bitboards.c	/^condition_type *get_next_condition(move_type *move){return$/;"	f	typeref:typename:condition_type *
+get_next_effect	move_bitboards.c	/^effect_type *get_next_effect(move_type * move){return$/;"	f	typeref:typename:effect_type *
+get_next_move_of_moveset	move_bitboards.c	/^move_type *get_next_move_of_moveset(moveset_type *moveset){return$/;"	f	typeref:typename:move_type *
+is_an_example_of_chessman	move_bitboards.c	/^bool is_an_example_of_chessman(chessman_type that_kind_of_chessman, square_datum_type chessman)$/;"	f	typeref:typename:bool
+is_chessman	move_bitboards.h	/^    #define is_chessman(/;"	d
+is_white	move_bitboards.c	/^#define is_white(/;"	d	file:
+king	move_bitboards.c	/^typedef enum{ pawn, rook, knight, bishop, queen, king } chessman_type;$/;"	e	enum:__anonc14435260103	file:
+kingside	move_bitboards.c	/^typedef enum { queenside, kingside } castling_side;$/;"	e	enum:__anonc14435260303	file:
+knight	move_bitboards.c	/^typedef enum{ pawn, rook, knight, bishop, queen, king } chessman_type;$/;"	e	enum:__anonc14435260103	file:
+line_move	move_bitboards.c	/^} line_move;$/;"	t	typeref:enum:__anonc14435260203	file:
+line_pieces	move_bitboards.c	/^const square_datum_type line_pieces[] = { white_rook, white_bishop, white_queen, black_rook, bla/;"	v	typeref:typename:const square_datum_type[]
+main	main.c	/^int main()$/;"	f	typeref:typename:int
+move_count	move_bitboards.h	/^        int move_count;$/;"	m	struct:__anonc144352b0408	typeref:typename:int
+move_type	move_bitboards.h	/^    } move_type;$/;"	t	typeref:struct:__anonc144352b0308
+moves	move_bitboards.h	/^        move_type moves[MAX_MOVES_PER_CHESSMAN];$/;"	m	struct:__anonc144352b0408	typeref:typename:move_type[]
+moveset_type	move_bitboards.h	/^    } moveset_type;$/;"	t	typeref:struct:__anonc144352b0408
+node_type	legal_moves.h	/^    typedef struct node_type node_type;$/;"	t	typeref:struct:node_type
+node_type	legal_moves.h	/^    typedef struct node_type{$/;"	s
+node_type	legal_moves.h	/^    } node_type;$/;"	t	typeref:struct:node_type
+opponent_chessmen	move_bitboards.c	/^square_datum_type opponent_chessmen(square_datum_type chessman){return$/;"	f	typeref:typename:square_datum_type
+opponent_control	move_bitboards.c	/^square_datum_type opponent_control(square_datum_type chessman){return$/;"	f	typeref:typename:square_datum_type
+own_castling_blockers	move_bitboards.c	/^square_datum_type own_castling_blockers(square_datum_type king)$/;"	f	typeref:typename:square_datum_type
+own_chessmen	move_bitboards.c	/^square_datum_type own_chessmen(square_datum_type chessman){return$/;"	f	typeref:typename:square_datum_type
+pawn	move_bitboards.c	/^typedef enum{ pawn, rook, knight, bishop, queen, king } chessman_type;$/;"	e	enum:__anonc14435260103	file:
+pawn_about_to_promote	move_bitboards.c	/^#define pawn_about_to_promote(/;"	d	file:
+pawn_on_start_row	move_bitboards.c	/^#define pawn_on_start_row(/;"	d	file:
+pawn_row_invalid	move_bitboards.c	/^#define pawn_row_invalid(/;"	d	file:
+player	position.h	/^    typedef enum { black_player, white_player } player;$/;"	t	typeref:enum:__anon46b917900103
+player_to_move	position.h	/^        player player_to_move;$/;"	m	struct:__anon46b917900208	typeref:typename:player
+position	legal_moves.h	/^        position_type position;$/;"	m	struct:node_type	typeref:typename:position_type
+position_type	position.h	/^    } position_type;$/;"	t	typeref:struct:__anon46b917900208
+print_position	position.c	/^void print_position(position_type position)$/;"	f	typeref:typename:void
+queen	move_bitboards.c	/^typedef enum{ pawn, rook, knight, bishop, queen, king } chessman_type;$/;"	e	enum:__anonc14435260103	file:
+queenside	move_bitboards.c	/^typedef enum { queenside, kingside } castling_side;$/;"	e	enum:__anonc14435260303	file:
+rank	move_bitboards.c	/^    file, rank, backslash_diagonal, forwardslash_diagonal$/;"	e	enum:__anonc14435260203	file:
+remove_datum_from_squares	move_bitboards.c	/^void remove_datum_from_squares(move_type *move, bitboard_type squares, square_datum_type chessma/;"	f	typeref:typename:void
+rook	move_bitboards.c	/^typedef enum{ pawn, rook, knight, bishop, queen, king } chessman_type;$/;"	e	enum:__anonc14435260103	file:
+set_position_from_fen	position.c	/^void set_position_from_fen(position_type *position, char *fen)$/;"	f	typeref:typename:void
+square_datum_type	move_bitboards.h	/^    } square_datum_type;$/;"	t	typeref:enum:__anonc144352b0103
+squares	move_bitboards.h	/^        bitboard_type squares; \/* a bit with a a value of 1 indicates that a square must be che/;"	m	struct:__anonc144352b0208	typeref:typename:bitboard_type
+squares_must_be_free_of	move_bitboards.c	/^void squares_must_be_free_of(move_type *move, bitboard_type squares, square_datum_type chessman)$/;"	f	typeref:typename:void
+squares_must_have	move_bitboards.c	/^void squares_must_have(move_type *move, bitboard_type squares, square_datum_type chessman)$/;"	f	typeref:typename:void
+white_bishop	move_bitboards.h	/^        white_pawn, white_rook, white_knight, white_bishop, white_queen, white_king,$/;"	e	enum:__anonc144352b0103
+white_castling	move_bitboards.h	/^        white_castling, black_castling,$/;"	e	enum:__anonc144352b0103
+white_castling_blockers	move_bitboards.h	/^        white_castling_blockers, black_castling_blockers,$/;"	e	enum:__anonc144352b0103
+white_chessmen	move_bitboards.h	/^        white_chessmen, black_chessmen,$/;"	e	enum:__anonc144352b0103
+white_control	move_bitboards.h	/^        white_control, black_control,$/;"	e	enum:__anonc144352b0103
+white_enpassant	move_bitboards.h	/^        white_enpassant, black_enpassant,$/;"	e	enum:__anonc144352b0103
+white_king	move_bitboards.h	/^        white_pawn, white_rook, white_knight, white_bishop, white_queen, white_king,$/;"	e	enum:__anonc144352b0103
+white_knight	move_bitboards.h	/^        white_pawn, white_rook, white_knight, white_bishop, white_queen, white_king,$/;"	e	enum:__anonc144352b0103
+white_pawn	move_bitboards.h	/^        white_pawn, white_rook, white_knight, white_bishop, white_queen, white_king,$/;"	e	enum:__anonc144352b0103
+white_player	position.h	/^    typedef enum { black_player, white_player } player;$/;"	e	enum:__anon46b917900103
+white_queen	move_bitboards.h	/^        white_pawn, white_rook, white_knight, white_bishop, white_queen, white_king,$/;"	e	enum:__anonc144352b0103
+white_rook	move_bitboards.h	/^        white_pawn, white_rook, white_knight, white_bishop, white_queen, white_king,$/;"	e	enum:__anonc144352b0103

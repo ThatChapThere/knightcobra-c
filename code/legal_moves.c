@@ -1,89 +1,74 @@
 #include <stdlib.h>
 #include <stdio.h>
+#include <stdbool.h>
 #include "legal_moves.h"
 #include "move_bitboards.h"
-#include "stdbool.h"
-
-
-node_type **get_next_child_of_node(node_type *node);
-
 
 void add_legal_moves_to_node(node_type *node, moveset_type *legal_moves)
 {
     position_type position = node->position;
+    bool white_to_move = position.player_to_move == white_player;
+    square_datum_type player_pawn = white_to_move ? white_pawn : black_pawn;
+    square_datum_type player_king = player_pawn + white_king - white_pawn; 
 
-    /* for every chessman of the player to move */
-    for(square_datum_type cm = white_pawn; cm <= white_king; cm++)
+    for(square_datum_type chessman = player_pawn; chessman <= player_king; chessman++)
     {
-        square_datum_type chessman = 
-            cm +
-            (
-                position.player_to_move == white_player ?
-                0: 
-                CHESSMEN_PER_SIDE
-            );
-        
         bitboard_type chessman_bitboard = position.bitboards[chessman];
 
         /* loop through bitboard and try to find examples of the chessman */
         for(int sq = 0; sq < 64; sq++)
         {
             /* if there isn't one, skip this iteration */
-            if(! ((chessman_bitboard >> (63 - sq)) & 1) ) continue;
+            bitboard_type current_square_at_final_bit = chessman_bitboard >> (63 - sq);
+            bool chessman_at_current_square = current_square_at_final_bit & 1;
+            
+            if(!chessman_at_current_square) continue;
 
-            moveset_type moveset = legal_moves[
-                chessman * NUMBER_OF_SQUARES +
-                sq
-            ];
+            moveset_type moveset = 
+            	legal_moves[chessman * NUMBER_OF_SQUARES + sq];
 
             for(int m = 0; m < moveset.move_count; m++)
             {
                 move_type move = moveset.moves[m];
                 bool is_legal = true;
 
-                /* ensure all conditions are met */
                 for(int c = 0; c < move.condition_count; c++)
                 {
                     condition_type condition = move.conditions[c];
+                    bitboard_type chessmen_on_condition_squares = position.bitboards[condition.datum] & condition.squares;
                     
                     if(condition.fill)
                     {
-                        /* if the overlap between the condition and reality less than the condition */
-                        /* ie. not all required squares are filled */
-                        if(
-                            (position.bitboards[condition.datum] & condition.squares) !=
-                            condition.squares
-                        ) is_legal = false;
+                        if(chessmen_on_condition_squares < condition.squares)
+                        	is_legal = false;
                     }
                     else
                     {
-                        /* if there is overlap between the condition and reality */
-                        /* ie. any required squares are filled */
-                        if(position.bitboards[condition.datum] & condition.squares)
-                            is_legal = false;
-                    }
+                    	if(chessmen_on_condition_squares)
+                    		is_legal = false;
+					}
                 }
 
                 if(is_legal)
                 {
-                    node_type **child = get_next_child_of_node(node);
-                    *child = malloc(sizeof(node_type));
-                    position_type *new_position = &(*child)->position;
+                    node_type *child = get_next_child_of_node(node);
+                    child = malloc(sizeof(node_type));
+                    position_type *new_position = &child->position;
                     copy_position_to(
                         node->position,
                         new_position
                     );
                     new_position->fifty_move_counter++;
                     new_position->player_to_move ^= true;
-
                     bool is_capture = false;
 
                     for(int e = 0; e < move.effect_count; e++)
                     {
                         effect_type effect = move.effects[e];
-
                         if(effect.fill)
+						{
                             new_position->bitboards[effect.datum] |= effect.squares;
+						}
                         else
                         {
                             new_position->bitboards[effect.datum] &= ~effect.squares;
@@ -102,8 +87,10 @@ void add_legal_moves_to_node(node_type *node, moveset_type *legal_moves)
     }
 }
 
-node_type **get_next_child_of_node(node_type *node)
-    { return &node->children[ node->child_count++ ]; }
+node_type *get_next_child_of_node(node_type *node)
+{
+	return node->children[node->child_count++];
+}
 
 void free_node(node_type *node)
 {
