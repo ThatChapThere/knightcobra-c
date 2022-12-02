@@ -51,9 +51,9 @@ void add_legal_moves_to_node(node_type *node, moveset_type *legal_moves)
 
                 if(is_legal)
                 {
-                    node_type *child = get_next_child_of_node(node);
-                    child = malloc(sizeof(node_type));
-                    position_type *new_position = &child->position;
+                    node_type **child = get_next_child_of_node(node);
+                    *child = malloc(sizeof(node_type));
+                    position_type *new_position = &(*child)->position;
                     copy_position_to(
                         node->position,
                         new_position
@@ -87,9 +87,16 @@ void add_legal_moves_to_node(node_type *node, moveset_type *legal_moves)
     }
 }
 
-node_type *get_next_child_of_node(node_type *node)
+// double pointer explained:
+//
+// when we need data, we return it
+// when we need to change data, we return a pointer to it.
+//
+// when we need a pointer, we return it
+// when we need to change a pointer, we return a pointer to it.
+node_type **get_next_child_of_node(node_type *node)
 {
-	return node->children[node->child_count++];
+	return &node->children[node->child_count++];
 }
 
 void free_node(node_type *node)

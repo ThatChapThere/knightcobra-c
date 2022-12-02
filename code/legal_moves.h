@@ -13,7 +13,7 @@ typedef struct node_type{
 	node_type *children[MAX_LEGAL_MOVES];
 } node_type;
 
-node_type *get_next_child_of_node(node_type *node);
+node_type **get_next_child_of_node(node_type *node);
 void add_legal_moves_to_node(node_type *node, moveset_type *legal_moves);
 void free_node(node_type *node);
 
