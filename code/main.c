@@ -15,6 +15,7 @@ int main()
         NUMBER_OF_SQUARES
     );
     generate_bitboards(legal_moves);
+    /* set a timer for benchmarking */
     time_t end_time = clock();
     printf("%d ms taken to generate bitboards\n\n", (int) difftime(end_time, start_time));
     position_type test_position;
@@ -25,7 +26,6 @@ int main()
     test_node.child_count = 0;
     add_legal_moves_to_node(&test_node, legal_moves);
     printf("\n%d legal moves available\n\n", test_node.child_count);
-
     for(int i = 0; i < test_node.child_count; i++)
 	{
         print_position(test_node.children[i]->position);
@@ -35,7 +35,6 @@ int main()
 			print_position(test_node.children[i]->children[j]->position);
 		}
 	}
-
     free_node(&test_node);
     free(legal_moves);
     getchar();
