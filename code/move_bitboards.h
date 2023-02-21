@@ -1,10 +1,8 @@
-#ifndef _MOVE_BITBOARDS_H_
-#define _MOVE_BITBOARDS_H_
+#ifndef MOVE_BITBOARDS_H
+#define MOVE_BITBOARDS_H
 
 #include <stdbool.h>
-
-/* all 12 pieces, plus castling, en passant and control for both sides */
-#define NUMBER_OF_SQUARE_DATA_TYPES (chessmen + 1)
+#include <stdint.h>
 
 #define NUMBER_OF_CHESSMEN 12
 #define CHESSMEN_PER_SIDE 6
@@ -13,71 +11,80 @@
 #define MAX_MOVES_PER_CHESSMAN 27
 #define NUMBER_OF_SQUARES 64
 
-#define MIN_WHITE_MAN_INDEX 0
-#define MAX_WHITE_MAN_INDEX 5
-#define MIN_BLACK_MAN_INDEX 6
-#define MAX_BLACK_MAN_INDEX 11
+#define MIN_WHITE_MAN_INDEX WHITE_PAWN
+#define MAX_WHITE_MAN_INDEX WHITE_KING
+#define MIN_BLACK_MAN_INDEX BLACK_PAWN
+#define MAX_BLACK_MAN_INDEX BLACK_KING
 
-#define is_chessman(sq_dtm) (sq_dtm <= black_king)
+#define is_chessman(sq_dtm) (sq_dtm <= BLACK_KING)
 
-typedef unsigned long long int bitboard_type;
+typedef uint64_t type_bitboard;
 
-typedef enum {
-	white_pawn, white_rook, white_knight, white_bishop, white_queen, white_king,
-	black_pawn, black_rook, black_knight, black_bishop, black_queen, black_king,
-	white_enpassant, black_enpassant,
-	white_castling, black_castling,
-	white_castling_blockers, black_castling_blockers,
-	white_control, black_control,
-	white_chessmen, black_chessmen,
-	chessmen
-} square_datum_type;
+enum square_datum
+{
+	WHITE_PAWN, WHITE_ROOK, WHITE_KNIGHT, WHITE_BISHOP, WHITE_QUEEN, WHITE_KING,
+	BLACK_PAWN, BLACK_ROOK, BLACK_KNIGHT, BLACK_BISHOP, BLACK_QUEEN, BLACK_KING,
+	WHITE_ENPASSANT, BLACK_ENPASSANT,
+	WHITE_CASTLING, BLACK_CASTLING,
+	WHITE_CASTLING_BLOCKERS, BLACK_CASTLING_BLOCKERS,
+	WHITE_CONTROL, BLACK_CONTROL,
+	WHITE_CHESSMEN, BLACK_CHESSMEN,
+	CHESSMEN,
+	NUMBER_OF_SQUARE_DATA_TYPES 
+};
 
-typedef enum{ pawn, rook, knight, bishop, queen, king } chessman_type;
+enum chessman {PAWN, ROOK, KNIGHT, BISHOP, QUEEN, KING};
 
-typedef struct {
-	bool fill; /* if 0, the square must be empty for a move to be legal; if 1 the square must be filled */
+struct condition
+{
+	bool must_contain;
 	int data_count;
-	square_datum_type datum; /* the datum that the square must (not) contain */
-	bitboard_type squares; /* a bit with a a value of 1 indicates that a square must be checked */
-} condition_type;
+	enum square_datum datum; /* the datum that the square must (not) contain */
+	type_bitboard squares; /* a bit with a a value of 1 indicates that a square must be checked */
+};
 
-/* this makes it possible to use functions on both types, as they hold the same data */
-/* here, "fill" means fill */
-typedef condition_type effect_type;
+struct effect
+{
+	bool adds; /* if 0, the square must be empty for a move to be legal; if 1 the square must be filled */
+	int data_count;
+	enum square_datum datum; /* the datum that the square must (not) contain */
+	type_bitboard squares; /* a bit with a a value of 1 indicates that a square must be checked */
+};
 
-typedef struct {
+struct move
+{
 	int condition_count;
 	int effect_count;
-	condition_type conditions[MAX_CONDITIONS];
-	effect_type effects[MAX_EFFECTS];
-} move_type;
+	struct condition conditions[MAX_CONDITIONS];
+	struct effect effects[MAX_EFFECTS];
+};
 
-typedef struct {
+struct moveset
+{
 	int move_count;
-	move_type moves[MAX_MOVES_PER_CHESSMAN];
-} moveset_type;
+	struct move moves[MAX_MOVES_PER_CHESSMAN];
+};
 
 /* functions */
-void generate_bitboards(moveset_type * legal_moves);
+void generate_bitboards(struct moveset *legal_moves);
 
-void generate_line_piece_bitboards (moveset_type *legal_moves, int f, int r, bitboard_type startsquare);
-void generate_knight_bitboards     (moveset_type *legal_moves, int f, int r, bitboard_type startsquare);
-void generate_king_bitboards       (moveset_type *legal_moves, int f, int r, bitboard_type startsquare);
-void generate_pawn_bitboards       (moveset_type *legal_moves, int f, int r, bitboard_type startsquare);
+void generate_line_piece_bitboards (struct moveset *legal_moves, int f, int r, type_bitboard startsquare);
+void generate_knight_bitboards     (struct moveset *legal_moves, int f, int r, type_bitboard startsquare);
+void generate_king_bitboards       (struct moveset *legal_moves, int f, int r, type_bitboard startsquare);
+void generate_pawn_bitboards       (struct moveset *legal_moves, int f, int r, type_bitboard startsquare);
 
-void add_single_effect(move_type *move, bitboard_type squares, square_datum_type chessman, bool is_addition);
-void add_datum_to_squares(move_type *move, bitboard_type squares, square_datum_type chessman);
-void remove_datum_from_squares(move_type *move, bitboard_type squares, square_datum_type chessman);
+void add_single_effect(struct move *move, type_bitboard squares, enum square_datum chessman, bool must_contain);
+void add_datum_to_squares(struct move *move, type_bitboard squares, enum square_datum chessman);
+void remove_datum_from_squares(struct move *move, type_bitboard squares, enum square_datum chessman);
 
-void add_single_condition(move_type *move, bitboard_type squares, square_datum_type chessman, bool must_be_filled);
-void squares_must_have(move_type *move, bitboard_type squares, square_datum_type chessman);
-void squares_must_be_free_of(move_type *move, bitboard_type squares, square_datum_type chessman);
+void add_single_condition(struct move *move, type_bitboard squares, enum square_datum chessman, bool adds);
+void squares_must_have(struct move *move, type_bitboard squares, enum square_datum chessman);
+void squares_must_be_free_of(struct move *move, type_bitboard squares, enum square_datum chessman);
 
-void add_intermediate_squares_to_move(move_type *move, bitboard_type squares);
-void add_end_square_to_move(move_type *move, bitboard_type squares, square_datum_type chessman);
-void add_through_squares_to_castling(move_type *move, bitboard_type squares, square_datum_type king);
+void add_intermediate_squares_to_move(struct move *move, type_bitboard squares);
+void add_end_square_to_move(struct move *move, type_bitboard squares, enum square_datum chessman);
+void add_through_squares_to_castling(struct move *move, type_bitboard squares, enum square_datum king);
 
-bool is_an_example_of_chessman(chessman_type kind_of_chessman, square_datum_type chessman);
+bool is_an_example_of_chessman(enum chessman kind_of_chessman, enum square_datum chessman);
 
 #endif
