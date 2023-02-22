@@ -59,7 +59,7 @@ void add_legal_moves_to_node(struct node *node, struct moveset *legal_moves)
                     new_position->player_to_move ^= true;
                     bool is_capture = false;
 
-                    for(int e = 0; e < move.effect_count; e++)
+                    for(int e = 0; e < 12 /*move.effect_count*/; e++)
                     {
                         struct effect effect = move.effects[e];
                         if(effect.adds)

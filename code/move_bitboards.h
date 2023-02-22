@@ -7,7 +7,14 @@
 #define NUMBER_OF_CHESSMEN 12
 #define CHESSMEN_PER_SIDE 6
 #define MAX_CONDITIONS 10
-#define MAX_EFFECTS 10
+/* 
+ * format: chessmen + general
+ * pick piece up = 1 + 2
+ * place piece down = 1 + 2
+ * capture any opponent pieces = 6 + 2
+ * total = 14
+ */
+#define MAX_EFFECTS 24 // TODO
 #define MAX_MOVES_PER_CHESSMAN 27
 #define NUMBER_OF_SQUARES 64
 

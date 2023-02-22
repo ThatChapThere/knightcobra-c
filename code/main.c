@@ -9,7 +9,7 @@
 int main()
 {
     /* set a timer for benchmarking */
-    time_t start_time = clock();
+    clock_t start_time = clock();
 
     /* rules of chess - left 1d for performance */
     /* note that 2d array in C are actually 1d anyway, sort of, so maybe fix this */
@@ -18,8 +18,8 @@ int main()
         NUMBER_OF_CHESSMEN *
         NUMBER_OF_SQUARES);
     generate_bitboards(legal_moves);
-    time_t end_time = clock();
-    printf("%d ms taken to generate bitboards\n\n", (int) difftime(end_time, start_time));
+    clock_t end_time = clock();
+    printf("%d ms taken to generate bitboards\n\n", (end_time - start_time) * 1000 / CLOCKS_PER_SEC);
 
     /* set the startion position */
     struct position test_position;
@@ -30,30 +30,32 @@ int main()
     test_node.child_count = 0;
 
     /* calculate legal moves */
-    int positions = 0;
-    add_legal_moves_to_node(&test_node, legal_moves);
-    printf("\n%d legal moves available\n\n", test_node.child_count);
-    for(int i = 0; i < test_node.child_count; i++)
+    int choice = 0;
+    while(true)
 	{
-        //print_position(test_node.children[i]->position);
-        add_legal_moves_to_node(test_node.children[i], legal_moves);
-        positions++;
-        for(int j = 0; j < test_node.children[i]->child_count; j++)
+		add_legal_moves_to_node(&test_node, legal_moves);
+
+		for(int i = 0; i < test_node.child_count; i++)
 		{
-			add_legal_moves_to_node(test_node.children[i]->children[j], legal_moves);
-			//print_position(test_node.children[i]->children[j]->position);
-			for(int k = 0; k < test_node.children[i]->children[j]->child_count; k++)
+			printf("%d.\n", i);
+			print_position(test_node.children[i]->position);
+		}
+		while(true)
+		{
+			scanf("%d", &choice);
+			if(0 <= choice && choice < test_node.child_count)
 			{
-				print_position(test_node.children[i]->children[j]->children[k]->position);
-				positions++;
+				struct position current_position = test_node.children[choice]->position;
+				free_node(&test_node);
+				copy_position_to(current_position, &test_node.position);
+				break;
 			}
 		}
 	}
-	printf("%d positions found\n", positions);
 
 	/* end program gracefully */
     free_node(&test_node);
     free(legal_moves);
-    getchar();
+    /* getchar(); */
     return 0;
 }

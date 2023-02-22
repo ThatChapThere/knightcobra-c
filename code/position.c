@@ -77,10 +77,25 @@ void print_position(struct position position)
 			'_' : '\n';
 	}
     int i = 0;
+	int square_filled = 0, error = 0;
     for(type_bitboard square = A8; square; square >>= 1, i++)
-	for(int cm = 0; cm < NUMBER_OF_CHESSMEN; cm++)
 	{
-		if(position.bitboards[cm] & square) output[i + i / 8] = chessman_characters[cm];
+		/* set the default to a ? if there is a "chessman" set here */
+		if(position.bitboards[CHESSMEN] & square)
+		{
+			output[i + i / 8] = '?';
+		}
+		square_filled = 0;
+		for(enum square_datum cm = 0; cm < NUMBER_OF_CHESSMEN; cm++)
+		{
+			if(position.bitboards[cm] & square)
+			{
+				output[i + i / 8] = square_filled ? '2' : chessman_characters[cm];
+				if(square_filled) error = 1;
+				square_filled = 1;
+			}
+		}
 	}
-    printf("\n%s\n", output);
+    printf("%s", output);
+    if(error) printf("!!!!!!!!\n");
 }
