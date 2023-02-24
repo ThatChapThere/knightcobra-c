@@ -7,13 +7,12 @@
 #define NUMBER_OF_CHESSMEN 12
 #define CHESSMEN_PER_SIDE 6
 #define MAX_CONDITIONS 10
-/* 
- * format: chessmen + general
+/* format: chessmen + general
  * pick piece up = 1 + 2
  * place piece down = 1 + 2
  * capture any opponent pieces = 6 + 2
- * total = 14
- */
+ * change whether or not castling is possible = 1
+ * total = 15 */
 #define MAX_EFFECTS 24 // TODO
 #define MAX_MOVES_PER_CHESSMAN 27
 #define NUMBER_OF_SQUARES 64
@@ -24,6 +23,8 @@
 #define MAX_BLACK_MAN_INDEX BLACK_KING
 
 #define is_chessman(sq_dtm) (sq_dtm <= BLACK_KING)
+
+#define FIRST_SQUARE (((uint64_t) 1) << 63)
 
 typedef uint64_t type_bitboard;
 
@@ -76,9 +77,9 @@ struct moveset
 void generate_bitboards(struct moveset *legal_moves);
 
 void generate_line_piece_bitboards (struct moveset *legal_moves, int f, int r, type_bitboard startsquare);
-void generate_knight_bitboards     (struct moveset *legal_moves, int f, int r, type_bitboard startsquare);
-void generate_king_bitboards       (struct moveset *legal_moves, int f, int r, type_bitboard startsquare);
-void generate_pawn_bitboards       (struct moveset *legal_moves, int f, int r, type_bitboard startsquare);
+void generate_knight_bitboards	 (struct moveset *legal_moves, int f, int r, type_bitboard startsquare);
+void generate_king_bitboards	   (struct moveset *legal_moves, int f, int r, type_bitboard startsquare);
+void generate_pawn_bitboards	   (struct moveset *legal_moves, int f, int r, type_bitboard startsquare);
 
 void add_single_effect(struct move *move, type_bitboard squares, enum square_datum chessman, bool must_contain);
 void add_datum_to_squares(struct move *move, type_bitboard squares, enum square_datum chessman);
