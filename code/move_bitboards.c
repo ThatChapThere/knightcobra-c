@@ -250,7 +250,6 @@ void generate_king_bitboards(struct moveset *legal_moves, int f, int r, type_bit
 				remove_datum_from_squares(castling_move, rook_startsquare, WHITE_ROOK);
 				add_datum_to_squares(castling_move, rook_endsquare, WHITE_ROOK);
 
-				//continue;
 				/* add conditions for squares being passed through */
 				add_through_squares_to_castling(
 					castling_move,

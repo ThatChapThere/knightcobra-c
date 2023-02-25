@@ -1,5 +1,9 @@
 # Chess Program Specification
 
+## Todo Currently
+* get rid of castling blockers - this is meaningless since the rules for what squares must be empty and what square must not be controlled are different
+* generate the control bitboards in legal_moves.c
+
 ## Things the Program Must Do
 * store positions
 * generate legal moves from a position
