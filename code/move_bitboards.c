@@ -27,7 +27,8 @@ enum square_datum opponent_control(enum square_datum chessman);
 enum square_datum opponent_chessmen(enum square_datum chessman);
 enum square_datum own_castling_blockers(enum square_datum king);
 enum square_datum *get_next_datum_from_condition_or_effect(struct condition *condition_or_effect);
-type_bitboard get_castling_throughsquares(type_bitboard startsquare, enum castling_side side);
+type_bitboard get_castling_unattacked_squares(enum square_datum king, enum castling_side side);
+type_bitboard get_castling_empty_squares(enum square_datum king, enum castling_side side);
 type_bitboard get_bit_from_line_move(int f, int r, int distance, enum line_move_direction line_move_direction);
 struct moveset *get_moveset_from_coordinates_and_chessman(struct moveset *legal_moves, int f, int r, enum square_datum chessman);
 void add_move_effects(struct move *move, type_bitboard squares, enum square_datum square_datum, bool adds);
@@ -216,6 +217,8 @@ void generate_king_bitboards(struct moveset *legal_moves, int f, int r, type_bit
 			{
 				struct move *castling_move = get_next_move_of_moveset(moveset);
 
+				enum square_datum rook = is_white(king) ? WHITE_ROOK : BLACK_ROOK;
+
 				const type_bitboard endsquare =
 					is_white(king) ?
 						side == KINGSIDE ?
@@ -247,18 +250,15 @@ void generate_king_bitboards(struct moveset *legal_moves, int f, int r, type_bit
 				add_datum_to_squares(castling_move, endsquare, king);
 
 				/* move rook */
-				remove_datum_from_squares(castling_move, rook_startsquare, WHITE_ROOK);
-				add_datum_to_squares(castling_move, rook_endsquare, WHITE_ROOK);
+				remove_datum_from_squares(castling_move, rook_startsquare, rook);
+				add_datum_to_squares(castling_move, rook_endsquare, rook);
 
-				/* add conditions for squares being passed through */
-				add_through_squares_to_castling(
-					castling_move,
-					get_castling_throughsquares(startsquare, side),
-					king
-				);
+				type_bitboard castling_unattacked_squares = get_castling_unattacked_squares(king, side);
+				type_bitboard castling_empty_squares = get_castling_empty_squares(king, side);
 
-				/* cannot castle out of check */
-				squares_must_be_free_of(castling_move, startsquare, opponent_control(king));
+				/* cannot castle out of or through check */
+				squares_must_be_free_of(castling_move, castling_unattacked_squares, opponent_control(king));
+				squares_must_be_free_of(castling_move, castling_empty_squares, CHESSMEN);
 
 				/* must be allowed to castle */
 				squares_must_have(castling_move, endsquare, own_castling_possible);
@@ -428,14 +428,6 @@ void add_move_effects(struct move *move, type_bitboard squares, enum square_datu
 		add_single_effect(move, squares, CHESSMEN, adds);
 		/* these will add or remove the fact that castling is blocked, but only on the relevant ranks
 		 * the limiting squares are h2 and a7 respectively */
-		if(squares < get_bit_from_coords(7, 6))
-		{
-			add_single_effect(move, squares, WHITE_CASTLING_BLOCKERS, adds);
-		}
-		if(squares > get_bit_from_coords(0, 1))
-		{
-			add_single_effect(move, squares, BLACK_CASTLING_BLOCKERS, adds);
-		}
 	}
 	/* if we mean to remove any piece of a given color, ie. a capture
 	 *
@@ -490,18 +482,6 @@ void add_intermediate_squares_to_move(struct move *move, type_bitboard squares)
 	squares_must_be_free_of(move, squares, CHESSMEN);
 }
 
-void add_through_squares_to_castling(struct move *move, type_bitboard squares, enum square_datum king)
-{
-	squares_must_be_free_of(move, squares, own_castling_blockers(king));
-}
-
-type_bitboard get_castling_throughsquares(type_bitboard startsquare, enum castling_side side)
-{
-	return side == KINGSIDE ?
-		(startsquare >> 1) | (startsquare >> 2):
-		(startsquare << 1) | (startsquare << 2);
-}
-
 /* add a set of squares where:
 	 * opponent pieces will be removed 
 	 * the current piece will be added 
@@ -540,9 +520,20 @@ enum square_datum opponent_chessmen(enum square_datum chessman){
 	return is_white(chessman) ? BLACK_CHESSMEN : WHITE_CHESSMEN;
 }
 
-enum square_datum own_castling_blockers(enum square_datum king)
+type_bitboard get_castling_unattacked_squares(enum square_datum king, enum castling_side side)
 {
-	return is_white(king) ? WHITE_CASTLING_BLOCKERS : BLACK_CASTLING_BLOCKERS;
+	int castling_direction = side == QUEENSIDE ? -1 : 1;
+	enum square_datum king_square = is_white(king) ? WHITE_KINGSQUARE : BLACK_KINGSQUARE;
+	return king_square | (king_square >> castling_direction) | (king_square >> (2 * castling_direction));
+}
+
+type_bitboard get_castling_empty_squares(enum square_datum king, enum castling_side side)
+{
+	type_bitboard king_square = is_white(king) ? WHITE_KINGSQUARE : BLACK_KINGSQUARE;
+	if(side == QUEENSIDE)
+		return (king_square << 1) | (king_square << 2) | (king_square << 3);
+	else
+		return (king_square >> 1) | (king_square >> 2);
 }
 
 /* return a bitboard with a 1 at the end of a line move */

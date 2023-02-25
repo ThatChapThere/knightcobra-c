@@ -29,10 +29,10 @@ int main()
 	test_node.position = test_position;
 	test_node.child_count = 0;
 
-	const int predetermined_move_count = 5;
+	const int predetermined_move_count = 6;
 	int predetermined_move = 0;
-	//int predetermined_moves[] = {9, 9, 16, 15, 22, 23};
-	int predetermined_moves[] = {1, 0, 0, 1, 0};
+	int predetermined_moves[] = {9, 9, 16, 15, 22, 23};
+	//int predetermined_moves[] = {1, 0, 0, 1, 0};
 
 	//printf("\e[0;32m");
 	/* calculate legal moves */

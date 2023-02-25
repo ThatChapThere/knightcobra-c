@@ -75,12 +75,7 @@ void set_position_from_fen(struct position *position, char *fen)
 			position->bitboards[BLACK_CHESSMEN] |= position->bitboards[chessman];
 	}
 
-	position->bitboards[WHITE_CASTLING_BLOCKERS] =
-	position->bitboards[BLACK_CASTLING_BLOCKERS] =
 	position->bitboards[CHESSMEN] = position->bitboards[WHITE_CHESSMEN] | position->bitboards[BLACK_CHESSMEN];
-
-	position->bitboards[WHITE_CASTLING_BLOCKERS] &= 0x00000000000000FFull;
-	position->bitboards[BLACK_CASTLING_BLOCKERS] &= 0xFF00000000000000ull;
 }
 
 void print_position(struct position position)
