@@ -1,6 +1,5 @@
 #include <stdio.h>
 #include "position.h"
-#include "move_bitboards.h"
 
 #define A8 FIRST_SQUARE
 
@@ -26,7 +25,7 @@ void set_position_from_fen(struct position *position, char *fen)
 	char next_character = fen[0];
 
 	/* the positions of the chessmen */
-	for(; next_character != ' '; i++)
+	for(; fen[i] != ' '; i++)
 	{
 		next_character = fen[i];
 
@@ -34,37 +33,54 @@ void set_position_from_fen(struct position *position, char *fen)
 			if(chessman_characters[cm] == next_character)
 				position->bitboards[cm] |= square;
 
-		square >>= 
-			('0' < next_character && next_character < '9') ?
-				next_character - '0' :
-			next_character == '/' ?
-				0 : 1;
+		square >>=
+			('1' <= next_character && next_character <= '8')?
+				next_character - '0':
+				next_character == '/' ? 0 : 1;
 	}
 
 	/* side to move */
-	for(; fen[i] != ' '; i++)
+	for(i++; fen[i] != ' '; i++)
+	{
 		position->player_to_move = fen[i] == 'w';
+	}
+
+	/* castling */
+	for(i++; fen[i] != ' '; i++)
+	{
+		switch(fen[i])
+		{
+			case 'K': position->bitboards[WHITE_CASTLING] |= WHITE_CASTLE_KINGSIDE_ENDSQUARE;  break;
+			case 'Q': position->bitboards[WHITE_CASTLING] |= WHITE_CASTLE_QUEENSIDE_ENDSQUARE; break;
+			case 'k': position->bitboards[BLACK_CASTLING] |= BLACK_CASTLE_KINGSIDE_ENDSQUARE;  break;
+			case 'q': position->bitboards[BLACK_CASTLING] |= BLACK_CASTLE_QUEENSIDE_ENDSQUARE; break;
+			default: break;
+		}
+	}
+
+	/* en passant */
+	for(i++; fen[i] != ' '; i++);
+
+	/* half moves */
+	for(i++; fen[i] != ' '; i++);
+
+	/* full moves */
+	for(i++; fen[i]; i++);
 
 	for(enum square_datum chessman = WHITE_PAWN; chessman <= BLACK_KING; chessman++)
+	{
 		if(chessman <= WHITE_KING)
 			position->bitboards[WHITE_CHESSMEN] |= position->bitboards[chessman];
 		else
 			position->bitboards[BLACK_CHESSMEN] |= position->bitboards[chessman];
-	
+	}
+
+	position->bitboards[WHITE_CASTLING_BLOCKERS] =
+	position->bitboards[BLACK_CASTLING_BLOCKERS] =
 	position->bitboards[CHESSMEN] = position->bitboards[WHITE_CHESSMEN] | position->bitboards[BLACK_CHESSMEN];
-	return;
 
-	/* castling */
-	for(; next_character != ' '; i++);
-
-	/* en passant */
-	for(; next_character != ' '; i++);
-
-	/* half moves */
-	for(; next_character != ' '; i++);
-
-	/* full moves */
-	for(; next_character; i++);
+	position->bitboards[WHITE_CASTLING_BLOCKERS] &= 0x00000000000000FFull;
+	position->bitboards[BLACK_CASTLING_BLOCKERS] &= 0xFF00000000000000ull;
 }
 
 void print_position(struct position position)

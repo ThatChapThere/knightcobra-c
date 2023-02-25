@@ -22,6 +22,17 @@
 #define MIN_BLACK_MAN_INDEX BLACK_PAWN
 #define MAX_BLACK_MAN_INDEX BLACK_KING
 
+#define WHITE_KINGSQUARE get_bit_from_coords(4, 7)
+#define WHITE_CASTLE_QUEENSIDE_ENDSQUARE get_bit_from_coords(2, 7)
+#define WHITE_CASTLE_QUEENSIDE_ROOKSQUARE get_bit_from_coords(0, 7)
+#define WHITE_CASTLE_KINGSIDE_ENDSQUARE get_bit_from_coords(6, 7)
+#define WHITE_CASTLE_KINGSIDE_ROOKSQUARE get_bit_from_coords(7, 7)
+#define BLACK_KINGSQUARE get_bit_from_coords(4, 0)
+#define BLACK_CASTLE_QUEENSIDE_ENDSQUARE get_bit_from_coords(2, 0)
+#define BLACK_CASTLE_QUEENSIDE_ROOKSQUARE get_bit_from_coords(0, 0)
+#define BLACK_CASTLE_KINGSIDE_ENDSQUARE get_bit_from_coords(6, 0)
+#define BLACK_CASTLE_KINGSIDE_ROOKSQUARE get_bit_from_coords(7, 0)
+
 #define is_chessman(sq_dtm) (sq_dtm <= BLACK_KING)
 
 #define FIRST_SQUARE (((uint64_t) 1) << 63)
@@ -94,5 +105,7 @@ void add_end_square_to_move(struct move *move, type_bitboard squares, enum squar
 void add_through_squares_to_castling(struct move *move, type_bitboard squares, enum square_datum king);
 
 bool is_an_example_of_chessman(enum chessman kind_of_chessman, enum square_datum chessman);
+
+type_bitboard get_bit_from_coords(int f, int r);
 
 #endif

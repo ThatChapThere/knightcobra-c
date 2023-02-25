@@ -9,17 +9,6 @@
 #define NUMBER_OF_DIAGONAL_PIECES 4
 #define LINE_MOVE_DIRECTIONS 4
 
-#define WHITE_KINGSQUARE get_bit_from_coords(4, 7)
-#define WHITE_CASTLE_QUEENSIDE_ENDSQUARE get_bit_from_coords(2, 7)
-#define WHITE_CASTLE_QUEENSIDE_ROOKSQUARE get_bit_from_coords(7, 7)
-#define WHITE_CASTLE_KINGSIDE_ENDSQUARE get_bit_from_coords(6, 7)
-#define WHITE_CASTLE_KINGSIDE_ROOKSQUARE get_bit_from_coords(7, 7)
-#define BLACK_KINGSQUARE get_bit_from_coords(4, 0)
-#define BLACK_CASTLE_QUEENSIDE_ENDSQUARE get_bit_from_coords(2, 0)
-#define BLACK_CASTLE_QUEENSIDE_ROOKSQUARE get_bit_from_coords(0, 0)
-#define BLACK_CASTLE_KINGSIDE_ENDSQUARE get_bit_from_coords(6, 0)
-#define BLACK_CASTLE_KINGSIDE_ROOKSQUARE get_bit_from_coords(7, 0)
-
 #define pawn_on_start_row(pawn, r) (is_white(pawn) ? r == 6 : r == 1)
 #define pawn_about_to_promote(pawn, r) (is_white(pawn) ? r == 1 : r == 6)
 #define pawn_row_invalid(r) (r == 0 || r == 7)
@@ -40,7 +29,6 @@ enum square_datum own_castling_blockers(enum square_datum king);
 enum square_datum *get_next_datum_from_condition_or_effect(struct condition *condition_or_effect);
 type_bitboard get_castling_throughsquares(type_bitboard startsquare, enum castling_side side);
 type_bitboard get_bit_from_line_move(int f, int r, int distance, enum line_move_direction line_move_direction);
-type_bitboard get_bit_from_coords(int f, int r);
 struct moveset *get_moveset_from_coordinates_and_chessman(struct moveset *legal_moves, int f, int r, enum square_datum chessman);
 void add_move_effects(struct move *move, type_bitboard squares, enum square_datum square_datum, bool adds);
 
@@ -86,7 +74,6 @@ void generate_line_piece_bitboards(struct moveset *legal_moves, int f, int r, ty
 				(!is_diagonal && is_an_example_of_chessman(BISHOP, line_piece))
 			) continue;
 
-			printf("new move direction\n");
 			/* loop through end places */
 			for(int end = 0; end < BOARD_WIDTH; end++)
 			{
@@ -118,8 +105,6 @@ void generate_line_piece_bitboards(struct moveset *legal_moves, int f, int r, ty
 					distance != move_distance;
 					distance += direction
 				) intermediate_squares |= get_bit_from_line_move(f, r, distance, line_move_direction);
-
-				printf("direction: %d, intermediate squares:%d\n", line_move_direction, intermediate_squares);
 
 				remove_datum_from_squares(move, startsquare, line_piece);
 				add_intermediate_squares_to_move(move, intermediate_squares);
@@ -265,18 +250,30 @@ void generate_king_bitboards(struct moveset *legal_moves, int f, int r, type_bit
 				remove_datum_from_squares(castling_move, rook_startsquare, WHITE_ROOK);
 				add_datum_to_squares(castling_move, rook_endsquare, WHITE_ROOK);
 
+				//continue;
 				/* add conditions for squares being passed through */
 				add_through_squares_to_castling(
 					castling_move,
-					get_castling_throughsquares(startsquare, KINGSIDE),
+					get_castling_throughsquares(startsquare, side),
 					king
 				);
 
 				/* cannot castle out of check */
 				squares_must_be_free_of(castling_move, startsquare, opponent_control(king));
 
-				/* must still be allowed to castle */
+				/* must be allowed to castle */
 				squares_must_have(castling_move, endsquare, own_castling_possible);
+
+				puts("castling");
+				/* cannot castle twice */
+				if(king == WHITE_KING)
+				{
+					remove_datum_from_squares(castling_move, WHITE_CASTLE_KINGSIDE_ENDSQUARE, WHITE_CASTLING);
+					remove_datum_from_squares(castling_move, WHITE_CASTLE_QUEENSIDE_ENDSQUARE, WHITE_CASTLING);
+				}else{
+					remove_datum_from_squares(castling_move, BLACK_CASTLE_KINGSIDE_ENDSQUARE, BLACK_CASTLING);
+					remove_datum_from_squares(castling_move, BLACK_CASTLE_QUEENSIDE_ENDSQUARE, BLACK_CASTLING);
+				}
 			}
 		}
 	}
@@ -423,20 +420,20 @@ void add_single_effect(struct move *move, type_bitboard squares, enum square_dat
 
 void add_move_effects(struct move *move, type_bitboard squares, enum square_datum square_datum, bool adds)
 {
+	add_single_effect(move, squares, square_datum, adds);
 	/* if we move a specific piece */
 	if(is_chessman(square_datum))
 	{
 		enum square_datum side = own_chessmen(square_datum);
-		add_single_effect(move, squares, square_datum, adds);
 		add_single_effect(move, squares, side, adds);
 		add_single_effect(move, squares, CHESSMEN, adds);
 		/* these will add or remove the fact that castling is blocked, but only on the relevant ranks
 		 * the limiting squares are h2 and a7 respectively */
-		if(square_datum < get_bit_from_coords(7, 1))
+		if(squares < get_bit_from_coords(7, 6))
 		{
 			add_single_effect(move, squares, WHITE_CASTLING_BLOCKERS, adds);
 		}
-		if(square_datum > get_bit_from_coords(0, 6))
+		if(squares > get_bit_from_coords(0, 1))
 		{
 			add_single_effect(move, squares, BLACK_CASTLING_BLOCKERS, adds);
 		}
@@ -445,7 +442,9 @@ void add_move_effects(struct move *move, type_bitboard squares, enum square_datu
 	 *
 	 * we don't apply an effect to the CHESSMAN bitboard, since captures always involve one chessman replacing
 	 * another
-	 * the only exception to this is en passant, where we remove pawns only anyway */
+	 * the only exception to this is en passant, where we remove pawns only anyway 
+	 * this is a bit confusing, but basically if you remove a pawn, the above code is called, and
+	 * so the CHESSMAN bitboard is corrected */
 	if(square_datum == WHITE_CHESSMEN || square_datum == BLACK_CHESSMEN)
 	{
 		add_single_effect(move, squares, square_datum, adds);
@@ -544,8 +543,7 @@ enum square_datum opponent_chessmen(enum square_datum chessman){
 
 enum square_datum own_castling_blockers(enum square_datum king)
 {
-	return
-	is_white(king) ? WHITE_CASTLING_BLOCKERS : BLACK_CASTLING_BLOCKERS;
+	return is_white(king) ? WHITE_CASTLING_BLOCKERS : BLACK_CASTLING_BLOCKERS;
 }
 
 /* return a bitboard with a 1 at the end of a line move */
