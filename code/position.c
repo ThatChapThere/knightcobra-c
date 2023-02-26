@@ -3,6 +3,12 @@
 
 #define A8 FIRST_SQUARE
 
+#define DARK_SQUARE_COLOUR  "\e[48;5;0m"
+#define LIGHT_SQUARE_COLOUR "\e[48;5;8m"
+#define BLACK_CHESSMAN_COLOUR "\e[38;5;11m"
+#define WHITE_CHESSMAN_COLOUR "\e[38;5;14m"
+#define RESET_COLOUR "\e[0m"
+
 const char chessman_characters[] = "PRNBQKprnbqk";
 
 void copy_position_to(struct position position_to_copy, struct position *position_to_copy_to)
@@ -80,33 +86,22 @@ void set_position_from_fen(struct position *position, char *fen)
 
 void print_position(struct position position)
 {
-	char output[73];
-	output[72] = '\0';
-	for(int i = 0; i < 72; i++)
-	{
-		output[i] = (i + 1) % 9 ?
-			'_' : '\n';
-	}
 	int i = 0;
-	int square_filled = 0, error = 0;
+	char chessman[3] = "  ";
 	for(type_bitboard square = A8; square; square >>= 1, i++)
 	{
-		/* set the default to a ? if there is a "chessman" set here */
-		if(position.bitboards[CHESSMEN] & square)
-		{
-			output[i + i / 8] = '?';
-		}
-		square_filled = 0;
+		chessman[0] = ' ';
+		printf((i+i/8)% 2 ? DARK_SQUARE_COLOUR : LIGHT_SQUARE_COLOUR );
 		for(enum square_datum cm = 0; cm < NUMBER_OF_CHESSMEN; cm++)
 		{
 			if(position.bitboards[cm] & square)
 			{
-				output[i + i / 8] = square_filled ? '2' : chessman_characters[cm];
-				if(square_filled) error = 1;
-				square_filled = 1;
+				printf(cm <= WHITE_KING ? WHITE_CHESSMAN_COLOUR : BLACK_CHESSMAN_COLOUR);
+				chessman[0] = chessman_characters[cm];
 			}
 		}
+		printf(chessman);
+		if(!((i+1) % 8)) printf("\n");
 	}
-	printf("%s", output);
-	if(error) printf("!!!!!!!!\n");
+	printf(RESET_COLOUR);
 }

@@ -14,8 +14,6 @@
 #define pawn_row_invalid(r) (r == 0 || r == 7)
 #define can_enpassant(pawn, r) (is_white(pawn) ? r == 3 : r == 4)
 
-#define is_white(chessman) (chessman <= MAX_WHITE_MAN_INDEX)
-
 enum line_move_direction {BOARDFILE, BOARDRANK, BACKSLASH_DIAGONAL, FORWARDSLASH_DIAGONAL};
 enum castling_side {QUEENSIDE, KINGSIDE};
 
@@ -263,7 +261,6 @@ void generate_king_bitboards(struct moveset *legal_moves, int f, int r, type_bit
 				/* must be allowed to castle */
 				squares_must_have(castling_move, endsquare, own_castling_possible);
 
-				puts("castling");
 				/* cannot castle twice */
 				if(king == WHITE_KING)
 				{

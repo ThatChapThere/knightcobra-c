@@ -15,5 +15,6 @@ struct node
 struct node **get_next_child_of_node(struct node *node);
 void add_legal_moves_to_node(struct node *node, struct moveset *legal_moves);
 void free_node(struct node *node);
+void search_at_depth(struct node *node, struct moveset *legal_moves, int depth);
 
 #endif

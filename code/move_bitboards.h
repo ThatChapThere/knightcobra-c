@@ -34,6 +34,7 @@
 #define BLACK_CASTLE_KINGSIDE_ROOKSQUARE get_bit_from_coords(7, 0)
 
 #define is_chessman(sq_dtm) (sq_dtm <= BLACK_KING)
+#define is_white(chessman) (chessman <= MAX_WHITE_MAN_INDEX)
 
 #define FIRST_SQUARE (((uint64_t) 1) << 63)
 
