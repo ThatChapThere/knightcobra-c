@@ -1,7 +1,7 @@
 #ifndef POSITION_H
 #define POSITION_H
 
-#include "move_bitboards.h"
+#include "rules.h"
 
 #define STARTING_FEN "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1"
 //#define STARTING_FEN "rnbqkbnr/8/8/8/8/8/8/RNBQKBNR b KQkq - 0 1"

@@ -1,5 +1,6 @@
 #include <stdio.h>
-#include "position.h"
+
+#include "display.h"
 
 #define A8 FIRST_SQUARE
 
@@ -10,6 +11,7 @@
 #define RESET_COLOUR "\e[0m"
 
 const char chessman_characters[] = "PRNBQKprnbqk";
+const char chessman_display_characters[] = "oRNBQK";
 
 void copy_position_to(struct position position_to_copy, struct position *position_to_copy_to)
 {
@@ -97,7 +99,7 @@ void print_position(struct position position)
 			if(position.bitboards[cm] & square)
 			{
 				printf(cm <= WHITE_KING ? WHITE_CHESSMAN_COLOUR : BLACK_CHESSMAN_COLOUR);
-				chessman[0] = chessman_characters[cm];
+				chessman[0] = chessman_display_characters[cm % CHESSMEN_PER_SIDE];
 			}
 		}
 		printf(chessman);

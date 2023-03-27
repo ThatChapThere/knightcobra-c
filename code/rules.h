@@ -13,7 +13,7 @@
  * capture any opponent pieces = 6 + 2
  * change whether or not castling is possible = 1
  * total = 15 */
-#define MAX_EFFECTS 24 // TODO
+#define MAX_EFFECTS 24 // TODO: determine what number this should be
 #define MAX_MOVES_PER_CHESSMAN 27
 #define NUMBER_OF_SQUARES 64
 
@@ -88,9 +88,9 @@ struct moveset
 void generate_bitboards(struct moveset *legal_moves);
 
 void generate_line_piece_bitboards (struct moveset *legal_moves, int f, int r, type_bitboard startsquare);
-void generate_knight_bitboards	 (struct moveset *legal_moves, int f, int r, type_bitboard startsquare);
-void generate_king_bitboards	   (struct moveset *legal_moves, int f, int r, type_bitboard startsquare);
-void generate_pawn_bitboards	   (struct moveset *legal_moves, int f, int r, type_bitboard startsquare);
+void generate_knight_bitboards     (struct moveset *legal_moves, int f, int r, type_bitboard startsquare);
+void generate_king_bitboards       (struct moveset *legal_moves, int f, int r, type_bitboard startsquare);
+void generate_pawn_bitboards       (struct moveset *legal_moves, int f, int r, type_bitboard startsquare);
 
 void add_single_effect(struct move *move, type_bitboard squares, enum square_datum chessman, bool must_contain);
 void add_datum_to_squares(struct move *move, type_bitboard squares, enum square_datum chessman);

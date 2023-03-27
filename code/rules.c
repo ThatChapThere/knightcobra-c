@@ -1,7 +1,8 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <stdbool.h>
-#include "move_bitboards.h"
+
+#include "rules.h"
 
 #define BOARD_WIDTH 8
 #define NUMBER_OF_LINE_PIECES 6

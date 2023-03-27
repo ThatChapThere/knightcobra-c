@@ -2,12 +2,13 @@
 #include <stdlib.h>
 #include <time.h>
 
-#include "move_bitboards.h"
-#include "legal_moves.h"
-#include "position.h"
+#include "rules.h"
+#include "move_generation.h"
+#include "display.h"
 
 int main()
 {
+	srand(time(NULL));
 	/* set a timer for benchmarking */
 	clock_t start_time = clock();
 
@@ -25,12 +26,45 @@ int main()
 	struct position test_position;
 	set_position_from_fen(&test_position, STARTING_FEN);
 	print_position(test_position);
-	struct node test_node;
-	test_node.position = test_position;
-	test_node.child_count = 0;
+
+	struct search_tree search_tree;
+	search_tree.last_node = search_tree.nodes;
+	search_tree.node_counter = 0;
+
+	struct node *top_node = search_tree.nodes;
+	top_node->position = test_position;
+	top_node->parent = NULL;
+
+	/* 5 not only crashes the program, it crashes the operating system */
+	int max_depth = 7;
+
+	start_time = clock();
+	search_at_depth(&search_tree, max_depth, legal_moves);
+	end_time = clock();
+
+	printf(
+		"%dms taken to search %d nodes at depth %d\n",
+		(end_time - start_time) * 1000 / CLOCKS_PER_SEC,
+		search_tree.node_counter,
+		max_depth
+	);
+
+	/*
+	int movecount = 0;
+	while(top_node.child_count && movecount < 10000 && top_node.position.bitboards[WHITE_KING] && top_node.position.bitboards[WHITE_KING] )
+	{
+		movecount++;
+		top_node.position = top_node.children[rand() % top_node.child_count]->position;
+		top_node.child_count = 0;
+		add_legal_moves_to_node(&top_node, legal_moves);
+		printf("\n");
+		print_position(top_node.position);
+	}
+
+	//print_position(top_node.children[9]->children[9]->children[9]->children[9]->position);
+	*/
 
 	/* end program gracefully */
-	free_node(&test_node);
 	free(legal_moves);
 	// getchar();
 	return 0;
