@@ -7,6 +7,7 @@
 //#define STARTING_FEN "rnbqkbnr/8/8/8/8/8/8/RNBQKBNR b KQkq - 0 1"
 //#define STARTING_FEN "rnbqkbnr/pppppppp/8/8/8/7P/PPPPPPP1/RNBQKBNR w KQkq - 0 1"
 //#define STARTING_FEN "r6r/8/8/8/8/8/8/R6R w KQkq - 0 1"
+#define A8 FIRST_SQUARE
 
 enum player {BLACK_PLAYER, WHITE_PLAYER};
 

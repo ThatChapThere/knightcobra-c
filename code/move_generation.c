@@ -3,7 +3,6 @@
 #include <stdbool.h>
 
 #include "move_generation.h"
-#include "rules.h"
 
 void add_legal_moves_to_node(struct search_tree *search_tree, struct node *node, struct moveset *legal_moves);
 
@@ -11,22 +10,19 @@ void search_at_depth(struct search_tree *search_tree, int depth, struct moveset 
 {
 	struct node *current_node = search_tree->nodes;
 	int current_depth = 0;
+
 	while(true)
 	{
-		if(current_depth <= depth - 5)
-		{
-			printf(".");
-			fflush(stdout);
-		}
 		search_tree->node_counter++;
-		if (current_depth < depth) {
+		if(current_depth < depth)
+		{
 			add_legal_moves_to_node(search_tree, current_node, legal_moves);
 			current_node = current_node->first_child;
 			current_depth++;
 		}
 		else
 		{
-			if(current_node != NULL && current_node + 1 <= current_node->parent->last_child)
+			if(current_node + 1 <= current_node->parent->last_child)
 			{
 				current_node++;
 			}
@@ -41,8 +37,7 @@ void search_at_depth(struct search_tree *search_tree, int depth, struct moveset 
 				{
 					current_node++;
 					search_tree->last_node = current_node->parent->last_child;
-				}
-				else return;
+				} else return;
 			}
 		}
 	}
@@ -89,7 +84,6 @@ void add_legal_moves_to_node(struct search_tree *search_tree, struct node *node,
 						if(chessmen_on_condition_squares) is_legal = false;
 					}
 				}
-
 				if(is_legal)
 				{
 					struct node *child = ++search_tree->last_node;
