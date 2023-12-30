@@ -28,6 +28,11 @@
  * as three digits (110), but 4 cannot ((1)00).
  *
  * So we always need to start with 3.
+ *
+ * Actually it has just occured to me that you should be able to do 2 > 4 > 8 after all, you just have to bit mask
+ * before addition as well as after. Actually, do you even have to do it after at that point?
+ *
+ * Nope, 2 > 4 > 8 turned out to be as simple as expected here.
  */
 unsigned int bit_count(uint64_t u)
 {
@@ -37,6 +42,17 @@ unsigned int bit_count(uint64_t u)
 	three_bit_counts = u - ((u >> 1) & 01333333333333333333333) - ((u >> 2) & 01111111111111111111111);
 	six_bit_counts = ((three_bit_counts + (three_bit_counts >> 3)) & 0707070707070707070707);
 	final_count = ((six_bit_counts + (six_bit_counts >> 6)) & 01700770077007700770077) % 4095;
+	return final_count;
+}
+
+unsigned int bit_count2to4to8(uint64_t u)
+{
+	uint64_t two_bit_counts,
+	         four_bit_counts;
+	unsigned int final_count;
+	two_bit_counts = u - ((u >> 1) & 0x5555555555555555);
+	four_bit_counts = (two_bit_counts & 0x3333333333333333) + ((two_bit_counts >> 2) & 0x3333333333333333);
+	final_count = ((four_bit_counts + (four_bit_counts >> 4)) & 0x0F0F0F0F0F0F0F0F) % 255;
 	return final_count;
 }
 
@@ -117,6 +133,6 @@ void test64()
 		{
 			test_number += 1ull << j;
 		}
-		printf("%llb contains %d true bits\n", test_number, bit_count(test_number));
+		printf("%llb contains %d true bits\n", test_number, bit_count2to4to8(test_number));
 	}
 }
