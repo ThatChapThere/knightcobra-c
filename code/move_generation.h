@@ -1,7 +1,7 @@
 #ifndef LEGAL_MOVES_H
 #define LEGAL_MOVES_H
 
-#include "display.h"
+#include "position.h"
 
 #define MAX_LEGAL_MOVES (9 * 27 + 2 * 14 + 3 * 8 + 2 * 13 - 16) /* 9Q 2R 2N 1K 2B */
 #define MAX_DEPTH 30
