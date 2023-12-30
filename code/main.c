@@ -6,9 +6,13 @@
 #include "move_generation.h"
 #include "display.h"
 #include "time_formatting.h"
+#include "bit_counter.h"
 
 int main()
 {
+	test32();
+	test64();
+	return 0;
 	/* rules of chess - left 1d for performance */
 	/* note that 2d arrays in C are actually 1d anyway, sort of, so maybe fix this */
 	struct moveset *legal_moves = malloc(
